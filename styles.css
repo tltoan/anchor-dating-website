@@ -1,0 +1,195 @@
+:root {
+    --text-color: #ffffff;
+    --anchor-blue: #4A6fa5; /* Adjusted to match image */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.hero {
+    background-image: url('anchor-landing-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    padding: 60px; /* Adjust padding to match visual */
+}
+
+.content {
+    position: absolute;
+    top: 60px;
+    left: 60px;
+}
+
+.logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 8rem; /* Large size */
+    color: white;
+    line-height: 1;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+.tagline {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 60px;
+    right: 60px; /* Move to right to match mobile/request logic if consistent, or keep separate */
+    left: auto; /* Reset left */
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.download-container {
+    /* Reset absolute positioning since it's now in footer */
+    position: static;
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 25px; /* Slightly smaller to fit in footer line */
+    border-radius: 20px;
+    text-decoration: none;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; /* Adjusted size */
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.apple-logo {
+    height: 30px; /* Adjusted size */
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.footer nav {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+    font-family: 'DM Serif Display', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-position: 75% center; /* Shift further left */
+    }
+
+    .content {
+        position: static;
+        margin-top: 0;
+        text-align: left;
+    }
+
+    .logo {
+        font-size: 4rem;
+        margin-bottom: 10px;
+    }
+
+    .tagline {
+        font-size: 1.5rem;
+    }
+
+    .footer {
+        position: static;
+        width: 100%;
+        display: flex;
+        flex-direction: row; /* Align horizontally */
+        justify-content: flex-end; /* Align to right */
+        align-items: center; /* Vertically center */
+        gap: 20px;
+        padding-bottom: 0;
+    }
+
+    .download-container {
+        position: static;
+        margin: 0;
+        display: block;
+        width: auto;
+    }
+
+    .download-btn {
+        font-size: 1rem; /* Smaller button for footer */
+        padding: 8px 16px;
+        width: auto;
+        border-radius: 12px;
+    }
+
+    .apple-logo {
+        height: 20px;
+    }
+
+    .footer nav {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .footer a {
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 3.5rem;
+    }
+    
+    .tagline {
+        font-size: 1.2rem;
+    }
+    
+    .footer {
+        flex-wrap: wrap; /* Allow wrapping if too tight */
+        justify-content: flex-end;
+        gap: 15px;
+    }
+}
