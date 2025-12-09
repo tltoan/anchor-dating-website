@@ -60,36 +60,72 @@ body, html {
     gap: 30px;
 }
 
-.download-container {
-    /* Reset absolute positioning since it's now in footer */
+.waitlist-container {
     position: static;
 }
 
-.download-btn {
+.waitlist-form {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
     border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 25px; /* Slightly smaller to fit in footer line */
     border-radius: 20px;
-    text-decoration: none;
-    color: white;
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem; /* Adjusted size */
+    overflow: hidden;
     transition: all 0.3s ease;
 }
 
-.download-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+.waitlist-form:focus-within {
     border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.apple-logo {
-    height: 30px; /* Adjusted size */
-    width: auto;
-    filter: brightness(0) invert(1);
+.waitlist-input {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    width: 220px;
+    outline: none;
+}
+
+.waitlist-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.waitlist-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 20px;
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.waitlist-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.waitlist-message {
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.waitlist-message.show {
+    opacity: 1;
 }
 
 .footer nav {
@@ -119,7 +155,7 @@ body, html {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        background-position: 75% center; /* Shift further left */
+        background-position: 75% center;
     }
 
     .content {
@@ -141,55 +177,84 @@ body, html {
         position: static;
         width: 100%;
         display: flex;
-        flex-direction: row; /* Align horizontally */
-        justify-content: flex-end; /* Align to right */
-        align-items: center; /* Vertically center */
+        flex-direction: column;
+        align-items: stretch;
         gap: 20px;
         padding-bottom: 0;
     }
 
-    .download-container {
-        position: static;
-        margin: 0;
-        display: block;
-        width: auto;
+    .waitlist-container {
+        width: 100%;
     }
 
-    .download-btn {
-        font-size: 1rem; /* Smaller button for footer */
-        padding: 8px 16px;
-        width: auto;
-        border-radius: 12px;
+    .waitlist-form {
+        width: 100%;
+        border-radius: 25px;
+        border-width: 2px;
     }
 
-    .apple-logo {
-        height: 20px;
+    .waitlist-input {
+        flex: 1;
+        width: auto;
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .waitlist-btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    .waitlist-message {
+        font-size: 1.2rem;
+        text-align: center;
     }
 
     .footer nav {
         display: flex;
-        gap: 20px;
-        align-items: center;
+        justify-content: center;
+        gap: 30px;
     }
 
     .footer a {
         font-size: 1rem;
-        white-space: nowrap;
     }
 }
 
 @media (max-width: 480px) {
+    .hero {
+        padding: 24px;
+    }
+
     .logo {
         font-size: 3.5rem;
     }
-    
+
     .tagline {
         font-size: 1.2rem;
     }
-    
+
     .footer {
-        flex-wrap: wrap; /* Allow wrapping if too tight */
-        justify-content: flex-end;
-        gap: 15px;
+        gap: 16px;
+    }
+
+    .waitlist-form {
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 4px;
+    }
+
+    .waitlist-input {
+        width: 100%;
+        text-align: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .waitlist-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 16px;
+        border-left: none;
     }
 }
