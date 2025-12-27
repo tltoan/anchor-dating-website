@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Anchor - Where dating is guaranteed</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <main class="hero">
+    <div class="content">
+      <h1 class="logo">Anchor</h1>
+      <p class="tagline">dates, guaranteed</p>
+    </div>
+
+    <footer class="footer">
+      <div class="waitlist-container">
+        <form class="waitlist-form" id="waitlistForm">
+          <input type="email" class="waitlist-input" placeholder="Enter your email" required id="emailInput" />
+          <button type="submit" class="waitlist-btn">
+            <span>Join Waitlist</span>
+          </button>
+        </form>
+        <p class="waitlist-message" id="waitlistMessage"></p>
+      </div>
+      <nav>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </nav>
+    </footer>
+
+    <script>
+      // Replace these with your Supabase credentials
+      const SUPABASE_URL = "https://ygklfmwcpbdovqyljxuy.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlna2xmbXdjcGJkb3ZxeWxqeHV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5OTQ4ODQsImV4cCI6MjA3OTU3MDg4NH0.QzrD90kp87E193hkW4kdHQbDXwKIPz46kfVF1Ul06Y0";
+
+      document
+        .getElementById("waitlistForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value;
+          const message = document.getElementById("waitlistMessage");
+          const form = document.getElementById("waitlistForm");
+          const button = document.querySelector(".waitlist-btn");
+
+          // Disable button while submitting
+          button.disabled = true;
+          button.querySelector("span").textContent = "Joining...";
+
+          try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+              method: "POST",
+              headers: {
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                "Content-Type": "application/json",
+                Prefer: "return=minimal",
+              },
+              body: JSON.stringify({ email: email }),
+            });
+
+            if (response.ok) {
+              form.style.display = "none";
+              message.textContent = "You're on the list!";
+              message.classList.add("show");
+            } else if (response.status === 409) {
+              // Duplicate email
+              form.style.display = "none";
+              message.textContent = "You're already on the list!";
+              message.classList.add("show");
+            } else {
+              throw new Error("Failed to join waitlist");
+            }
+          } catch (error) {
+            button.disabled = false;
+            button.querySelector("span").textContent = "Join Waitlist";
+            message.textContent = "Something went wrong. Try again.";
+            message.classList.add("show");
+            console.error("Error:", error);
+          }
+        });
+    </script>
+  </main>
+</body>
+
+</html>

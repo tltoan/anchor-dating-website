@@ -1,0 +1,515 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --text-color: #ffffff;
+  --anchor-blue: #4a6fa5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-averia-serif);
+  --font-family-serif: var(--font-averia-serif), serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Ensure font variables are available globally */
+html {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif;
+}
+
+/* Force font application for serif elements */
+.font-serif,
+[class*="font-serif"] {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+  font-feature-settings: normal;
+}
+
+.font-serif {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+}
+
+/* Ensure font is applied to all serif elements */
+h1.font-serif,
+h2.font-serif,
+h3.font-serif,
+p.font-serif,
+span.font-serif,
+button.font-serif,
+a.font-serif {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+/* Legal Pages Styles - Premium */
+.legal-container-premium {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 80px 20px 120px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFFCF8 0%, #F8F5F0 50%, #FFFCF8 100%);
+  overflow-x: hidden;
+}
+
+.legal-background-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(74, 111, 165, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(255, 192, 203, 0.04) 0%, transparent 50%),
+    linear-gradient(135deg, #FFFCF8 0%, #FFF5F5 30%, #F8F5F0 70%, #FFFCF8 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: romanticGradientShift 20s ease-in-out infinite;
+}
+
+@keyframes romanticGradientShift {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.02);
+  }
+}
+
+.romantic-floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(circle at 15% 30%, rgba(255, 182, 193, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 85% 70%, rgba(255, 192, 203, 0.12) 0%, transparent 30%);
+  opacity: 0.6;
+}
+
+.legal-content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.legal-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  background-color: #FFFCF8;
+  min-height: 100vh;
+}
+
+.legal-header {
+  text-align: center;
+  margin-bottom: 80px;
+  position: relative;
+}
+
+.brand-name {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+  color: var(--anchor-blue);
+  font-size: 1.75rem;
+  margin-bottom: 30px;
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.05), rgba(74, 111, 165, 0.05));
+  backdrop-filter: blur(10px);
+}
+
+.brand-name::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1.5px;
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.4), 
+    var(--anchor-blue), 
+    rgba(255, 192, 203, 0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.brand-name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.1), 
+    rgba(74, 111, 165, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+
+.brand-name:hover::before {
+  opacity: 1;
+}
+
+.brand-name:hover::after {
+  opacity: 1;
+}
+
+.brand-name:hover {
+  transform: translateY(-3px);
+  color: var(--anchor-blue);
+  box-shadow: 0 8px 24px rgba(255, 182, 193, 0.2);
+}
+
+.page-title {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  color: #000;
+  margin-bottom: 20px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.last-updated {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #666;
+  font-weight: 600;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+.legal-content {
+  font-size: 1.05rem;
+  color: #2a2a2a;
+  line-height: 1.8;
+  position: relative;
+}
+
+.legal-content h2 {
+  font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  margin-top: 60px;
+  margin-bottom: 25px;
+  color: #000;
+  letter-spacing: -0.01em;
+  position: relative;
+  padding-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.legal-content h2:hover {
+  transform: translateX(5px);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.legal-content h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    rgba(255, 182, 193, 0.6), 
+    var(--anchor-blue), 
+    transparent);
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.legal-content h2:hover::after {
+  width: 80px;
+}
+
+.legal-content h3 {
+  font-family: var(--font-sans);
+  font-size: 1.3rem;
+  margin-top: 40px;
+  margin-bottom: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.legal-content p {
+  margin-bottom: 20px;
+  color: #2a2a2a;
+  font-weight: 400;
+}
+
+.legal-content ul {
+  margin-bottom: 25px;
+  padding-left: 24px;
+  list-style: none;
+}
+
+.legal-content ul li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 12px;
+  color: #2a2a2a;
+  line-height: 1.7;
+}
+
+.legal-content ul li::before {
+  content: '♥';
+  position: absolute;
+  left: 0;
+  color: rgba(255, 182, 193, 0.8);
+  font-weight: normal;
+  font-size: 0.9em;
+  line-height: 1.8;
+  transition: all 0.3s ease;
+}
+
+.legal-content ul li:hover::before {
+  color: var(--anchor-blue);
+  transform: scale(1.2);
+}
+
+.legal-content li {
+  margin-bottom: 12px;
+}
+
+.legal-content strong {
+  font-weight: 700;
+  color: #000;
+}
+
+.legal-table-wrapper {
+  overflow-x: auto;
+  margin: 30px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: white;
+}
+
+.legal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  background: white;
+}
+
+.legal-content table thead tr {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  text-align: left;
+}
+
+.legal-content table th {
+  padding: 16px 20px;
+  border: none;
+  font-weight: 700;
+  color: #000;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-sans);
+}
+
+.legal-content table td {
+  padding: 16px 20px;
+  border-top: 1px solid #e9ecef;
+  color: #2a2a2a;
+}
+
+.legal-content table tbody tr {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.legal-content table tbody tr:hover {
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.05), 
+    rgba(74, 111, 165, 0.05));
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.1);
+}
+
+.legal-content table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.legal-content hr {
+  margin: 60px 0;
+  border: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 182, 193, 0.3), 
+    var(--anchor-blue), 
+    rgba(255, 182, 193, 0.3), 
+    transparent);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.legal-content hr::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.5), 
+    transparent);
+  animation: shimmerLine 3s ease-in-out infinite;
+}
+
+@keyframes shimmerLine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Premium animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .legal-container-premium {
+    padding: 60px 20px 100px;
+  }
+  
+  .legal-header {
+    margin-bottom: 50px;
+  }
+  
+  .legal-content {
+    font-size: 1rem;
+  }
+  
+  .legal-content h2 {
+    margin-top: 50px;
+    font-size: 1.75rem;
+  }
+  
+  .legal-content h3 {
+    font-size: 1.15rem;
+  }
+  
+  .legal-container {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-container-premium {
+    padding: 40px 16px 80px;
+  }
+  
+  .legal-header {
+    margin-bottom: 40px;
+  }
+  
+  .brand-name {
+    font-size: 1.5rem;
+  }
+  
+  .legal-content h2 {
+    font-size: 1.5rem;
+    margin-top: 40px;
+  }
+  
+  .legal-content h3 {
+    font-size: 1.1rem;
+  }
+  
+  .legal-content ul {
+    padding-left: 20px;
+  }
+  
+  .legal-content ul li {
+    padding-left: 20px;
+  }
+  
+  .legal-table-wrapper {
+    border-radius: 8px;
+  }
+  
+  .legal-content table th,
+  .legal-content table td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+}
