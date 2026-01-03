@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antony's Anchor Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      background: transparent;
+    }
+
+    #anchor-card-container {
+      width: 560px;
+      aspect-ratio: 1.6;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    #background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #dark-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    #card-content {
+      position: relative;
+      z-index: 1;
+      padding: 28px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    #name-section {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    #name {
+      font-family: 'DM Serif Text', serif;
+      font-size: 38px;
+      font-weight: 400;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+    }
+
+    #pronouns {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #header-right {
+      text-align: right;
+    }
+
+    #card-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    #verified-badge {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    #verified-star {
+      color: #FFD700;
+      font-size: 14px;
+    }
+
+    #verified-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFD700;
+    }
+
+    #main-content {
+      display: flex;
+      gap: 24px;
+      flex: 1;
+    }
+
+    #photo-container {
+      width: 130px;
+      height: 170px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    #profile-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #info-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .info-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: #FFFFFF;
+      text-align: right;
+    }
+
+    #tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFFFFF;
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body>
+  <div id="anchor-card-container">
+    <img id="background-image" src="public/anchor-landing-bg.jpg" alt="Date background" />
+    <div id="dark-overlay"></div>
+    
+    <div id="card-content">
+      <div id="header-section">
+        <div id="name-section">
+          <span id="name">Antony</span>
+          <span id="pronouns">he/him</span>
+        </div>
+        <div id="header-right">
+          <span id="card-label">Anchor Card</span>
+        </div>
+      </div>
+      
+      <div id="main-content">
+        <div id="photo-container">
+          <img id="profile-photo" src="public/antony_photos/antony-look-in-the-night.jpeg" alt="Antony" />
+        </div>
+        
+        <div id="info-section">
+          <div class="info-row">
+            <span class="info-label">Age</span>
+            <span class="info-value">20</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Hgt</span>
+            <span class="info-value">5'10"</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Occ</span>
+            <span class="info-value">Software Engineer</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Loc</span>
+            <span class="info-value">Nueva York, NY</span>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tags-container">
+        <span class="tag">Coffee Lover</span>
+        <span class="tag">Foodie</span>
+        <span class="tag">Tech</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
