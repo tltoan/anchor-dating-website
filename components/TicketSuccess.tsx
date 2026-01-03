@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
-import { FormData } from "@/app/page";
 import toast from "react-hot-toast";
 
 interface TicketSuccessProps {
-  formData: FormData;
+  userId: string;
   paymentIntentId: string;
   onWalletAdded: () => void;
   onBack?: () => void;
@@ -15,16 +14,13 @@ interface TicketSuccessProps {
 
 interface Ticket {
   id: string;
-  name: string;
-  email: string;
-  phone: string;
+  user_id: string;
   payment_intent_id: string;
-  ticket_purchased_at: string;
   created_at: string;
 }
 
 export default function TicketSuccess({
-  formData,
+  userId,
   paymentIntentId,
   onWalletAdded,
   onBack,
@@ -37,7 +33,7 @@ export default function TicketSuccess({
     // Generate unique QR code data (payment intent ID + email for verification)
     const qrString = JSON.stringify({
       id: paymentIntentId,
-      email: formData.email,
+      email: userId,
       timestamp: Date.now(),
     });
     setQrData(qrString);
@@ -48,7 +44,7 @@ export default function TicketSuccess({
         const response = await fetch("/api/get-user-tickets", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: formData.phone }),
+          body: JSON.stringify({ user_id: userId }),
         });
 
         if (response.ok) {
@@ -75,14 +71,13 @@ export default function TicketSuccess({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: formData.email,
-        name: formData.name,
+        user_id: userId,
         qrData: qrString,
       }),
     }).catch((error) => {
       console.error("Failed to send email:", error);
     });
-  }, [paymentIntentId, formData]);
+  }, [paymentIntentId, userId]);
 
   const handleStoreClick = (store: "appstore" | "playstore") => {
     const appStoreUrl =
@@ -215,7 +210,7 @@ export default function TicketSuccess({
                   Your Ticket is Ready!
                 </h2>
                 <p className="text-white/60 font-serif text-base md:text-lg font-light">
-                  Your ticket has been emailed to {formData.email}
+                  Your ticket has been sent to your registered email
                 </p>
               </motion.div>
 
@@ -291,9 +286,16 @@ export default function TicketSuccess({
                               Ticket #{ticket.payment_intent_id.slice(-8)}
                             </p>
                             <p className="font-serif text-sm text-white/60 font-light">
-                              {new Date(
-                                ticket.ticket_purchased_at
-                              ).toLocaleDateString()}
+                              Purchased:{" "}
+                              {ticket.created_at
+                                ? new Date(
+                                    ticket.created_at
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })
+                                : "Date not available"}
                             </p>
                           </div>
                           <div className="h-2 w-2 rounded-full bg-green-400"></div>

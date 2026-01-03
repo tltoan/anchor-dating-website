@@ -6,7 +6,7 @@ import { FormData } from "@/app/page";
 import toast from "react-hot-toast";
 
 interface SignupFormProps {
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormData, userId?: string) => void;
   onBack: () => void;
   initialFormData?: FormData;
 }
@@ -52,6 +52,7 @@ export default function SignupForm({
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const [showExistingTickets, setShowExistingTickets] = useState(false);
   const [hasCheckedOnLoad, setHasCheckedOnLoad] = useState(false);
+  const [userId, setUserId] = useState<string>("");
 
   // Check for existing tickets when component loads with phone number
   useEffect(() => {
@@ -70,11 +71,33 @@ export default function SignupForm({
           const checkResponse = await fetch("/api/check-existing-user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ phone: formData.phone }),
+          body: JSON.stringify({ phone: formData.phone, email: formData.email }),
           });
 
-          if (checkResponse.ok) {
-            const checkData = await checkResponse.json();
+        const checkData = await checkResponse.json().catch(async () => {
+          // If JSON parsing fails, try to get text
+          const text = await checkResponse.text();
+          return { error: text || "Unknown error" };
+        });
+        console.log("Check response:", checkData);
+
+        // Check for mismatch errors (email/phone combination issue)
+        if (checkData.mismatch && checkData.error) {
+          console.log("Mismatch detected:", checkData.error);
+          toast.error(checkData.error);
+          setIsCheckingUser(false);
+          
+          // Set appropriate field error
+          if (checkData.errorType === "email_mismatch" || checkData.errorType === "both_mismatch") {
+            setErrors({ ...errors, email: checkData.error });
+          }
+          if (checkData.errorType === "phone_mismatch" || checkData.errorType === "both_mismatch") {
+            setErrors({ ...errors, phone: checkData.error });
+          }
+          return; // Don't proceed to payment
+        }
+
+        if (checkResponse.ok) {
             console.log("Initial check response:", checkData);
 
             if (
@@ -136,18 +159,42 @@ export default function SignupForm({
       setIsCheckingUser(true);
 
       try {
-        // First, check if user exists and has tickets by phone number
-        console.log("Checking for existing user with phone:", formData.phone);
+        // First, check if user exists by both email and phone number
+        console.log("Checking for existing user with phone:", formData.phone, "email:", formData.email);
         const checkResponse = await fetch("/api/check-existing-user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: formData.phone }),
+          body: JSON.stringify({ phone: formData.phone, email: formData.email }),
         });
 
-        if (checkResponse.ok) {
-          const checkData = await checkResponse.json();
-          console.log("Check response:", checkData);
+        const checkData = await checkResponse.json().catch(async () => {
+          // If JSON parsing fails, try to get text
+          const text = await checkResponse.text();
+          return { error: text || "Unknown error" };
+        });
+        console.log("Check response:", checkData);
 
+        // Check for mismatch errors (email/phone combination issue)
+        if (checkData.mismatch && checkData.error) {
+          console.log("Mismatch detected:", checkData.error);
+          toast.error(checkData.error);
+          setIsCheckingUser(false);
+          
+          // Set appropriate field error
+          if (checkData.errorType === "email_mismatch" || checkData.errorType === "both_mismatch") {
+            setErrors({ ...errors, email: checkData.error });
+          }
+          if (checkData.errorType === "phone_mismatch" || checkData.errorType === "both_mismatch") {
+            setErrors({ ...errors, phone: checkData.error });
+          }
+          return; // Don't proceed to payment
+        }
+
+        if (checkResponse.ok) {
+          // Store userId if user exists
+          if (checkData.userId) {
+            setUserId(checkData.userId);
+          }
           // If user exists and has tickets, show them
           if (
             checkData.exists &&
@@ -169,8 +216,12 @@ export default function SignupForm({
         } else {
           console.error(
             "Failed to check existing user:",
-            await checkResponse.text()
+            checkData.error || "Unknown error"
           );
+          // If it's a mismatch error, we already handled it above
+          if (checkData.mismatch) {
+            return;
+          }
         }
 
         // If no existing tickets, proceed normally
@@ -181,7 +232,16 @@ export default function SignupForm({
           body: JSON.stringify(formData),
         });
 
-        if (!saveResponse.ok) {
+        let finalUserId = userId || checkData.userId;
+
+        if (saveResponse.ok) {
+          const saveData = await saveResponse.json().catch(() => ({}));
+          // Get userId from saved user data
+          if (saveData.data && saveData.data[0] && saveData.data[0].id) {
+            finalUserId = saveData.data[0].id;
+            setUserId(finalUserId);
+          }
+        } else {
           const errorData = await saveResponse.json().catch(() => ({}));
           console.error(
             "Failed to save user to wishlist:",
@@ -207,11 +267,11 @@ export default function SignupForm({
           toast.error(errorData.error || "Failed to save. Please try again.");
         }
 
-        onSubmit(formData);
+        onSubmit(formData, finalUserId);
       } catch (error) {
         console.error("Error checking/saving user:", error);
         // Continue anyway - don't block the flow
-        onSubmit(formData);
+        onSubmit(formData, userId || undefined);
       } finally {
         setIsCheckingUser(false);
       }
@@ -233,7 +293,7 @@ export default function SignupForm({
       console.error("Error saving user:", error);
     }
 
-    onSubmit(formData);
+    onSubmit(formData, userId);
   };
 
   const handleStoreClick = (store: "appstore" | "playstore") => {

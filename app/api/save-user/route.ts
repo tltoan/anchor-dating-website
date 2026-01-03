@@ -15,9 +15,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
     
-    const { name, email, phone, paymentIntentId } = await request.json()
-
-    if (!name || !email || !phone || !paymentIntentId) {
+    const { userId, paymentIntentId } = await request.json()
+console.log('userId=====', userId)
+console.log('paymentIntentId', paymentIntentId)
+    if (!userId || !paymentIntentId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -26,12 +27,10 @@ export async function POST(request: NextRequest) {
 
     // Create a NEW ticket entry in the tickets table
     // This allows multiple tickets per user
+    // Tickets table only has: id, user_id, payment_intent_id, created_at
     const ticketData = {
-      name,
-      email,
-      phone,
+      user_id: userId,
       payment_intent_id: paymentIntentId,
-      ticket_purchased_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
     };
 
@@ -60,11 +59,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Update has_ticket status in waitlist table
+    if (data && data[0]) {
+      const { error: updateError } = await supabase
+        .from("waitlist")
+        .update({ has_ticket: true })
+        .eq("id", userId);
+
+      if (updateError) {
+        // If has_ticket column doesn't exist, log warning but don't fail
+        if (updateError.message?.includes("has_ticket") || updateError.message?.includes("column")) {
+          console.warn("has_ticket column not found in waitlist table. Please run migration.");
+        } else {
+          console.error("Failed to update has_ticket status:", updateError);
+        }
+      } else {
+        console.log("Updated has_ticket to true for user:", userId);
+      }
+    }
+
     return NextResponse.json({ success: true, data })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Save user error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to save user' },
+      { error: errorMessage || 'Failed to save user' },
       { status: 500 }
     )
   }

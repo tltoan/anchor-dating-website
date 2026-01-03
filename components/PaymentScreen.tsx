@@ -26,11 +26,12 @@ const stripePromise = loadStripe(stripeKey);
 
 interface PaymentScreenProps {
   formData: FormData;
+  userId?: string;
   onSuccess: (paymentIntentId: string) => void;
   onBack: () => void;
 }
 
-function CheckoutForm({ formData, onSuccess, onBack }: PaymentScreenProps) {
+function CheckoutForm({ formData, userId, onSuccess, onBack }: PaymentScreenProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -68,12 +69,18 @@ function CheckoutForm({ formData, onSuccess, onBack }: PaymentScreenProps) {
         toast.error(error.message || "Payment failed");
         setIsProcessing(false);
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        // Save user data to Supabase
+        // Save ticket with userId
+        if (!userId) {
+          toast.error("User ID is missing. Please try again.");
+          setIsProcessing(false);
+          return;
+        }
+        
         await fetch("/api/save-user", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...formData,
+            userId: userId,
             paymentIntentId: paymentIntent.id,
           }),
         });
@@ -235,6 +242,7 @@ function CheckoutForm({ formData, onSuccess, onBack }: PaymentScreenProps) {
 
 export default function PaymentScreen({
   formData,
+  userId,
   onSuccess,
   onBack,
 }: PaymentScreenProps) {
@@ -421,6 +429,7 @@ export default function PaymentScreen({
               >
                 <CheckoutForm
                   formData={formData}
+                  userId={userId}
                   onSuccess={onSuccess}
                   onBack={onBack}
                 />

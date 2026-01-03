@@ -32,6 +32,7 @@ function HomeContent() {
   });
 
   const [paymentIntentId, setPaymentIntentId] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
 
   // Sync step with URL and localStorage (client-side only)
   useEffect(() => {
@@ -89,6 +90,12 @@ function HomeContent() {
     if (savedPaymentIntent) {
       setPaymentIntentId(savedPaymentIntent);
     }
+
+    // Restore userId
+    const savedUserId = localStorage.getItem("anchor_userId");
+    if (savedUserId) {
+      setUserId(savedUserId);
+    }
   }, [stepParam, router]);
 
   // Save form data to localStorage whenever it changes (client-side only)
@@ -107,12 +114,23 @@ function HomeContent() {
     }
   }, [paymentIntentId, isClient]);
 
+  // Save userId to localStorage (client-side only)
+  useEffect(() => {
+    if (!isClient) return;
+    if (userId) {
+      localStorage.setItem("anchor_userId", userId);
+    }
+  }, [userId, isClient]);
+
   const handleGetStarted = () => {
     setStep("form");
   };
 
-  const handleFormSubmit = (data: FormData) => {
+  const handleFormSubmit = (data: FormData, userId?: string) => {
     setFormData(data);
+    if (userId) {
+      setUserId(userId);
+    }
     setStep("payment");
   };
 
@@ -128,6 +146,7 @@ function HomeContent() {
       localStorage.removeItem("anchor_step");
       localStorage.removeItem("anchor_formData");
       localStorage.removeItem("anchor_paymentIntentId");
+      localStorage.removeItem("anchor_userId");
     }, 1000);
   };
 
@@ -156,6 +175,7 @@ function HomeContent() {
           <PaymentScreen
             key="payment"
             formData={formData}
+            userId={userId}
             onSuccess={handlePaymentSuccess}
             onBack={() => setStep("form")}
           />
@@ -163,7 +183,7 @@ function HomeContent() {
         {step === "ticket" && (
           <TicketSuccess
             key="ticket"
-            formData={formData}
+            userId={userId}
             paymentIntentId={paymentIntentId}
             onWalletAdded={handleWalletAdded}
             onBack={() => {

@@ -28,7 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${averiaSerif.variable} ${inter.variable}`}>
-      <body className={`${averiaSerif.variable} ${inter.variable} antialiased`}>
+      <body
+        className={`${averiaSerif.variable} ${inter.variable} antialiased`}
+        suppressHydrationWarning
+      >
         {children}
         <Toaster position="top-center" />
       </body>

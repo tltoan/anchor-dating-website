@@ -15,28 +15,21 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { phone } = await request.json();
+    const { user_id } = await request.json();
 
-    if (!phone) {
+    if (!user_id) {
       return NextResponse.json(
-        { error: "Missing phone number" },
+        { error: "Missing user_id" },
         { status: 400 }
       );
     }
 
-    // Normalize phone number for comparison
-    const normalizePhone = (phone: string) => {
-      if (!phone) return "";
-      return phone.replace(/[\s\-\(\)\+]/g, "");
-    };
-
-    const normalizedPhone = normalizePhone(phone);
-
-    // Get all tickets from tickets table and filter by normalized phone
-    const { data: allTickets, error: fetchError } = await supabase
+    // Get tickets by user_id
+    const { data: tickets, error: fetchError } = await supabase
       .from("tickets")
-      .select("*")
-      .order("ticket_purchased_at", { ascending: false });
+      .select("id, user_id, payment_intent_id, created_at")
+      .eq("user_id", user_id)
+      .order("created_at", { ascending: false });
 
     if (fetchError) {
       console.error("Supabase error:", fetchError);
@@ -61,12 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Filter tickets by normalized phone number
-    const data = allTickets?.filter(
-      (t) => normalizePhone(t.phone || "") === normalizedPhone
-    ) || [];
-
-    return NextResponse.json({ success: true, tickets: data || [] });
+    return NextResponse.json({ success: true, tickets: tickets || [] });
   } catch (error: any) {
     console.error("Get user tickets error:", error);
     return NextResponse.json(
