@@ -4,10 +4,12 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import Hero from "@/components/Hero";
-import SignupForm from "@/components/SignupForm";
-import PaymentScreen from "@/components/PaymentScreen";
-import TicketSuccess from "@/components/TicketSuccess";
-import PremiumMessage from "@/components/PremiumMessage";
+import WaitlistSignup from "@/components/WaitlistSignup";
+// OLD PAYMENT FLOW - HIDDEN BUT KEPT FOR FUTURE USE
+// import SignupForm from "@/components/SignupForm";
+// import PaymentScreen from "@/components/PaymentScreen";
+// import TicketSuccess from "@/components/TicketSuccess";
+// import PremiumMessage from "@/components/PremiumMessage";
 
 export type FormData = {
   name: string;
@@ -15,7 +17,7 @@ export type FormData = {
   phone: string;
 };
 
-export type FlowStep = "hero" | "form" | "payment" | "ticket" | "premium";
+export type FlowStep = "hero" | "waitlist" | "form" | "payment" | "ticket" | "premium";
 
 function HomeContent() {
   const router = useRouter();
@@ -56,14 +58,14 @@ function HomeContent() {
     // Restore step from URL or localStorage
     if (
       stepParam &&
-      ["hero", "form", "payment", "ticket", "premium"].includes(stepParam)
+      ["hero", "waitlist", "form", "payment", "ticket", "premium"].includes(stepParam)
     ) {
       setStep(stepParam);
     } else {
       const savedStep = localStorage.getItem("anchor_step") as FlowStep | null;
       if (
         savedStep &&
-        ["hero", "form", "payment", "ticket", "premium"].includes(savedStep)
+        ["hero", "waitlist", "form", "payment", "ticket", "premium"].includes(savedStep)
       ) {
         setStep(savedStep);
         const params = new URLSearchParams();
@@ -123,7 +125,7 @@ function HomeContent() {
   }, [userId, isClient]);
 
   const handleGetStarted = () => {
-    setStep("form");
+    setStep("waitlist");
   };
 
   const handleFormSubmit = (data: FormData, userId?: string) => {
@@ -163,7 +165,14 @@ function HomeContent() {
     <main className="min-h-screen w-full overflow-hidden bg-slate-900">
       <AnimatePresence mode="wait">
         {step === "hero" && <Hero key="hero" onGetStarted={handleGetStarted} />}
-        {step === "form" && (
+        {step === "waitlist" && (
+          <WaitlistSignup
+            key="waitlist"
+            onBack={() => setStep("hero")}
+          />
+        )}
+        {/* OLD PAYMENT FLOW - HIDDEN BUT KEPT FOR FUTURE USE */}
+        {/* {step === "form" && (
           <SignupForm
             key="form"
             onSubmit={handleFormSubmit}
@@ -192,7 +201,7 @@ function HomeContent() {
             }}
           />
         )}
-        {step === "premium" && <PremiumMessage key="premium" />}
+        {step === "premium" && <PremiumMessage key="premium" />} */}
       </AnimatePresence>
     </main>
   );

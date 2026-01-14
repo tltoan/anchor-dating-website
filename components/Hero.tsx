@@ -72,7 +72,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
                 className="relative z-10 flex items-center justify-center gap-2  rounded-full  "
                 style={{ padding: "10px" }}
               >
-                Get Started
+                Join Waitlist
                 <svg
                   className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
                   fill="none"
