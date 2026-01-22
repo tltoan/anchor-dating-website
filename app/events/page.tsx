@@ -238,16 +238,16 @@ function EventsListPage({ events, loading, onEventClick }: EventsListPageProps) 
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
 
-      <div className="relative z-10 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 font-serif text-4xl md:text-5xl text-white font-light text-center"
+          className="mb-12 font-serif text-4xl md:text-5xl text-white font-light text-center"
         >
           Events
         </motion.h1>
 
-        <div className="w-full">
+        <div className="w-full flex items-center justify-center">
           <EventsList events={events} loading={loading} onEventClick={onEventClick} />
         </div>
       </div>
