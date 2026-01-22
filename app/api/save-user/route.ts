@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
-    
-    const { userId, paymentIntentId } = await request.json()
-console.log('userId=====', userId)
-console.log('paymentIntentId', paymentIntentId)
-    if (!userId || !paymentIntentId) {
+
+    const { userId, paymentIntentId, email, name, phone } = await request.json()
+    console.log('userId=====', userId)
+    console.log('paymentIntentId', paymentIntentId)
+    if (!paymentIntentId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -27,12 +27,28 @@ console.log('paymentIntentId', paymentIntentId)
 
     // Create a NEW ticket entry in the tickets table
     // This allows multiple tickets per user
-    // Tickets table only has: id, user_id, payment_intent_id, created_at
-    const ticketData = {
-      user_id: userId,
+    // Tickets table has: id, user_id, email, name, phone, payment_intent_id, created_at
+    const ticketData: any = {
       payment_intent_id: paymentIntentId,
+      ticket_purchased_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
     };
+
+    // Add user_id if provided (for waitlist users)
+    if (userId) {
+      ticketData.user_id = userId;
+    }
+
+    // Add email, name, phone if provided (for events website users)
+    if (email) {
+      ticketData.email = email.toLowerCase().trim();
+    }
+    if (name) {
+      ticketData.name = name;
+    }
+    if (phone) {
+      ticketData.phone = phone;
+    }
 
     const { data, error } = await supabase
       .from('tickets')
@@ -41,18 +57,18 @@ console.log('paymentIntentId', paymentIntentId)
 
     if (error) {
       console.error('Supabase error:', error)
-      
+
       // If error is unique constraint on payment_intent_id (shouldn't happen, but handle it)
       if (error.code === '23505' || error.message?.includes('unique') || error.message?.includes('duplicate')) {
         return NextResponse.json(
-          { 
+          {
             error: 'This payment has already been processed.',
             code: error.code,
           },
           { status: 400 }
         )
       }
-      
+
       return NextResponse.json(
         { error: 'Failed to save ticket', details: error.message },
         { status: 500 }

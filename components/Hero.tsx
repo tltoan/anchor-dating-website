@@ -2,12 +2,19 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface HeroProps {
   onGetStarted: () => void;
 }
 
 export default function Hero({ onGetStarted }: HeroProps) {
+  const router = useRouter();
+
+  const handleEventsClick = () => {
+    router.push('/events');
+  };
+
   return (
     <motion.div
       className="relative min-h-screen w-full bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 bg-cover bg-center bg-no-repeat"
@@ -61,7 +68,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          <div className="w-full md:w-auto p-200">
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <motion.button
               onClick={onGetStarted}
               className="group relative w-full overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-br from-white/20 via-white/15 to-white/10 px-10 py-5 font-serif text-xl font-semibold text-white backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 hover:border-white/50 hover:from-white/30 hover:via-white/25 hover:to-white/15 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] md:w-auto md:px-12 md:py-6"
@@ -73,6 +80,33 @@ export default function Hero({ onGetStarted }: HeroProps) {
                 style={{ padding: "10px" }}
               >
                 Join Waitlist
+                <svg
+                  className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:animate-shimmer" />
+            </motion.button>
+            <motion.button
+              onClick={handleEventsClick}
+              className="group relative w-full overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-br from-pink-500/30 via-purple-500/30 to-blue-500/30 px-10 py-5 font-serif text-xl font-semibold text-white backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all duration-300 hover:border-white/50 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] md:w-auto md:px-12 md:py-6"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span
+                className="relative z-10 flex items-center justify-center gap-2  rounded-full  "
+                style={{ padding: "10px" }}
+              >
+                Events
                 <svg
                   className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
                   fill="none"

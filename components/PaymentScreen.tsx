@@ -82,6 +82,9 @@ function CheckoutForm({ formData, userId, onSuccess, onBack }: PaymentScreenProp
           body: JSON.stringify({
             userId: userId,
             paymentIntentId: paymentIntent.id,
+            email: formData.email,
+            name: formData.name,
+            phone: formData.phone,
           }),
         });
 
