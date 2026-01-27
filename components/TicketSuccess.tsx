@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
-import toast from "react-hot-toast";
 
 interface TicketSuccessProps {
   userId: string;
@@ -28,15 +27,22 @@ export default function TicketSuccess({
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [qrData, setQrData] = useState("");
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Generate unique QR code data (payment intent ID + email for verification)
-    const qrString = JSON.stringify({
-      id: paymentIntentId,
+  // Generate QR code data for a specific ticket
+  const generateQRData = useCallback((ticketPaymentIntentId: string) => {
+    return JSON.stringify({
+      id: ticketPaymentIntentId,
       email: userId,
       timestamp: Date.now(),
     });
+  }, [userId]);
+
+  useEffect(() => {
+    // Generate unique QR code data for the current payment (payment intent ID + email for verification)
+    const qrString = generateQRData(paymentIntentId);
     setQrData(qrString);
+    setSelectedTicketId(paymentIntentId);
 
     // Fetch user tickets
     const fetchTickets = async () => {
@@ -77,7 +83,7 @@ export default function TicketSuccess({
     }).catch((error) => {
       console.error("Failed to send email:", error);
     });
-  }, [paymentIntentId, userId]);
+  }, [paymentIntentId, userId, generateQRData]);
 
   const handleStoreClick = (store: "appstore" | "playstore") => {
     const appStoreUrl =
@@ -92,6 +98,13 @@ export default function TicketSuccess({
     } else {
       window.open(playStoreUrl, "_blank");
     }
+  };
+
+  const handleTicketClick = (ticket: Ticket) => {
+    // Generate QR code for the selected ticket
+    const ticketQrData = generateQRData(ticket.payment_intent_id);
+    setQrData(ticketQrData);
+    setSelectedTicketId(ticket.payment_intent_id);
   };
 
   return (
@@ -215,22 +228,29 @@ export default function TicketSuccess({
               </motion.div>
 
               {/* QR Code */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                className="mb-8 flex justify-center"
-              >
-                <div
-                  className="rounded-2xl border-2 border-white/20 bg-black/10 p-6 backdrop-blur-sm"
-                  style={{
-                    boxShadow:
-                      "0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
-                    padding: "16px",
-                    marginBottom: "1rem",
-                  }}
+              {qrData && (
+                <motion.div
+                  key={selectedTicketId}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-8 flex flex-col items-center"
                 >
-                  {qrData && (
+                  {tickets.length > 1 && (
+                    <p className="mb-4 font-serif text-sm text-white/60 font-light">
+                      Click on a ticket below to view its QR code
+                    </p>
+                  )}
+                  <div
+                    className="rounded-2xl border-2 border-white/20 bg-black/10 p-6 backdrop-blur-sm"
+                    style={{
+                      boxShadow:
+                        "0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                      padding: "16px",
+                      marginBottom: "1rem",
+                    }}
+                  >
                     <QRCodeSVG
                       value={qrData}
                       size={220}
@@ -239,9 +259,9 @@ export default function TicketSuccess({
                       fgColor="#ffffff"
                       bgColor="transparent"
                     />
-                  )}
-                </div>
-              </motion.div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Ticket List */}
               <motion.div
@@ -264,44 +284,72 @@ export default function TicketSuccess({
                   </div>
                 ) : tickets.length > 0 ? (
                   <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {tickets.map((ticket, index) => (
-                      <motion.div
-                        key={ticket.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.7 + index * 0.1 }}
-                        className="rounded-xl border border-white/20 bg-white/5 p-4 backdrop-blur-sm"
-                        style={{
-                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-                          padding: "10px",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <div
-                          className="flex items-center justify-between"
-                          style={{}}
+                    {tickets.map((ticket, index) => {
+                      const isSelected = selectedTicketId === ticket.payment_intent_id;
+                      return (
+                        <motion.div
+                          key={ticket.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.7 + index * 0.1 }}
+                          onClick={() => handleTicketClick(ticket)}
+                          className={`rounded-xl border p-4 backdrop-blur-sm cursor-pointer transition-all ${
+                            isSelected
+                              ? "border-white/40 bg-white/10"
+                              : "border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/8"
+                          }`}
+                          style={{
+                            boxShadow: isSelected
+                              ? "inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(139, 92, 246, 0.3)"
+                              : "inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                            padding: "10px",
+                            marginBottom: "10px",
+                          }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          <div>
-                            <p className="font-serif text-white font-light">
-                              Ticket #{ticket.payment_intent_id.slice(-8)}
-                            </p>
-                            <p className="font-serif text-sm text-white/60 font-light">
-                              Purchased:{" "}
-                              {ticket.created_at
-                                ? new Date(
-                                    ticket.created_at
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  })
-                                : "Date not available"}
-                            </p>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-serif text-white font-light">
+                                Ticket #{ticket.payment_intent_id.slice(-8)}
+                              </p>
+                              <p className="font-serif text-sm text-white/60 font-light">
+                                Purchased:{" "}
+                                {ticket.created_at
+                                  ? new Date(
+                                      ticket.created_at
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : "Date not available"}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isSelected && (
+                                <motion.svg
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="h-5 w-5 text-purple-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </motion.svg>
+                              )}
+                              <div className="h-2 w-2 rounded-full bg-green-400"></div>
+                            </div>
                           </div>
-                          <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-center font-serif text-white/60 font-light py-4">

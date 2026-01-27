@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FormData } from "@/app/page";
 import toast from "react-hot-toast";
+import { QRCodeSVG } from "qrcode.react";
 
 interface SignupFormProps {
   onSubmit: (data: FormData, userId?: string) => void;
@@ -53,6 +54,8 @@ export default function SignupForm({
   const [showExistingTickets, setShowExistingTickets] = useState(false);
   const [hasCheckedOnLoad, setHasCheckedOnLoad] = useState(false);
   const [userId, setUserId] = useState<string>("");
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<string>("");
 
   // Check for existing tickets when component loads with phone number
   useEffect(() => {
@@ -311,6 +314,30 @@ export default function SignupForm({
     }
   };
 
+  // Generate QR code data for a specific ticket
+  const generateQRData = useCallback((ticketPaymentIntentId: string) => {
+    return JSON.stringify({
+      id: ticketPaymentIntentId,
+      email: formData.email || userId,
+      timestamp: Date.now(),
+    });
+  }, [formData.email, userId]);
+
+  const handleTicketClick = (ticket: Ticket) => {
+    // Generate QR code for the selected ticket
+    const ticketQrData = generateQRData(ticket.payment_intent_id);
+    setQrData(ticketQrData);
+    setSelectedTicketId(ticket.payment_intent_id);
+  };
+
+  // Reset QR code when hiding existing tickets
+  useEffect(() => {
+    if (!showExistingTickets) {
+      setQrData("");
+      setSelectedTicketId(null);
+    }
+  }, [showExistingTickets]);
+
   return (
     <motion.div
       className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 bg-cover bg-center bg-no-repeat"
@@ -433,37 +460,92 @@ export default function SignupForm({
                   exit={{ opacity: 0, y: -20 }}
                   className="mb-6 space-y-4"
                 >
+                  {!selectedTicketId && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mb-4 text-center font-serif text-sm text-white/60 font-light"
+                    >
+                      Click on a ticket below to view its QR code
+                    </motion.p>
+                  )}
+
                   <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {existingTickets.map((ticket, index) => (
-                      <motion.div
-                        key={ticket.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="rounded-xl border border-white/20 bg-white/5 p-4 backdrop-blur-sm"
-                        style={{
-                          boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-                          padding: "10px",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-serif text-white font-light">
-                              Ticket #
-                              {ticket.payment_intent_id?.slice(-8) || "N/A"}
-                            </p>
-                            <p className="font-serif text-sm text-white/60 font-light">
-                              Purchased:{" "}
-                              {new Date(
-                                ticket.ticket_purchased_at
-                              ).toLocaleDateString()}
-                            </p>
+                    {existingTickets.map((ticket, index) => {
+                      const isSelected = selectedTicketId === ticket.payment_intent_id;
+                      return (
+                        <motion.div
+                          key={ticket.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          onClick={() => handleTicketClick(ticket)}
+                          className={`rounded-xl border p-4 backdrop-blur-sm cursor-pointer transition-all ${
+                            isSelected
+                              ? "border-white/40 bg-white/10"
+                              : "border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/8"
+                          }`}
+                          style={{
+                            boxShadow: isSelected
+                              ? "inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 20px rgba(139, 92, 246, 0.3)"
+                              : "inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                            padding: "10px",
+                            marginBottom: "10px",
+                          }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-serif text-white font-light">
+                                Ticket #
+                                {ticket.payment_intent_id?.slice(-8) || "N/A"}
+                              </p>
+                              <p className="font-serif text-sm text-white/60 font-light">
+                                Purchased:{" "}
+                                {ticket.ticket_purchased_at
+                                  ? new Date(
+                                      ticket.ticket_purchased_at
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : ticket.created_at
+                                  ? new Date(
+                                      ticket.created_at
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : "Date not available"}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isSelected && (
+                                <motion.svg
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="h-5 w-5 text-purple-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </motion.svg>
+                              )}
+                              <div className="h-2 w-2 rounded-full bg-green-400"></div>
+                            </div>
                           </div>
-                          <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      );
+                    })}
                   </div>
 
                   <motion.button
@@ -561,6 +643,176 @@ export default function SignupForm({
                   >
                     Enter different phone number
                   </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* QR Code Modal - Shows on separate overlay/page when ticket is clicked */}
+            <AnimatePresence>
+              {qrData && selectedTicketId && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-6"
+                  style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+                  onClick={() => {
+                    setQrData("");
+                    setSelectedTicketId(null);
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl max-w-md w-full"
+                    style={{
+                      padding: "2rem",
+                      boxShadow:
+                        "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                      background:
+                        "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                    }}
+                  >
+                    {/* Close Button */}
+                    <motion.button
+                      onClick={() => {
+                        setQrData("");
+                        setSelectedTicketId(null);
+                      }}
+                      className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors z-10"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </motion.button>
+
+                    {/* QR Code Content */}
+                    <div className="flex flex-col items-center">
+                      <h3 className="mb-4 font-serif text-3xl text-white font-light">
+                        Your Ticket QR Code
+                      </h3>
+                      <div
+                        className="rounded-2xl border-2 border-white/20 bg-black/10 p-6 backdrop-blur-sm mb-4"
+                        style={{
+                          boxShadow:
+                            "0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                          padding: "16px",
+                        }}
+                      >
+                        <QRCodeSVG
+                          value={qrData}
+                          size={280}
+                          level="H"
+                          includeMargin={false}
+                          fgColor="#ffffff"
+                          bgColor="transparent"
+                        />
+                      </div>
+                      <p className="text-center font-serif text-sm text-white/60 font-light">
+                        Show this QR code at the event entrance
+                      </p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* QR Code Modal - Shows on separate overlay when ticket is clicked */}
+            <AnimatePresence>
+              {qrData && selectedTicketId && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-6"
+                  style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}
+                  onClick={() => {
+                    setQrData("");
+                    setSelectedTicketId(null);
+                  }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl max-w-md w-full"
+                    style={{
+                      padding: "2rem",
+                      boxShadow:
+                        "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                      background:
+                        "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
+                    }}
+                  >
+                    {/* Close Button */}
+                    <motion.button
+                      onClick={() => {
+                        setQrData("");
+                        setSelectedTicketId(null);
+                      }}
+                      className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </motion.button>
+
+                    {/* QR Code Content */}
+                    <div className="flex flex-col items-center">
+                      <h3 className="mb-4 font-serif text-3xl text-white font-light">
+                        Your Ticket QR Code
+                      </h3>
+                      <div
+                        className="rounded-2xl border-2 border-white/20 bg-black/10 p-6 backdrop-blur-sm mb-4"
+                        style={{
+                          boxShadow:
+                            "0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                          padding: "16px",
+                        }}
+                      >
+                        <QRCodeSVG
+                          value={qrData}
+                          size={280}
+                          level="H"
+                          includeMargin={false}
+                          fgColor="#ffffff"
+                          bgColor="transparent"
+                        />
+                      </div> 
+                      <p className="text-center font-serif text-sm text-white/60 font-light">
+                        Show this QR code at the event entrance
+                      </p>
+                    </div>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

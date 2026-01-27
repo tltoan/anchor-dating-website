@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Averia_Serif_Libre, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { Providers } from "@/components/Providers";
 
 const averiaSerif = Averia_Serif_Libre({
   weight: ["300", "400", "700"],
@@ -32,8 +33,10 @@ export default function RootLayout({
         className={`${averiaSerif.variable} ${inter.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
-        <Toaster position="top-center" />
+        <Providers>
+          {children}
+          <Toaster position="top-center" />
+        </Providers>
       </body>
     </html>
   );

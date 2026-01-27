@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Save user to wishlist (before payment)
     // Try with has_ticket first, fallback without it if column doesn't exist
     let data, error;
-    
+
     const insertData: any = {
       name,
       email,
@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
     // If wishlist entry already exists, don't create another one
     if (existingWishlistEntry) {
       console.log("Wishlist entry already exists for phone:", phone);
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         data: [existingWishlistEntry],
         message: "Wishlist entry already exists"
       });
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         .from("waitlist")
         .insert(insertData)
         .select();
-      
+
       data = fallbackResult.data;
       error = fallbackResult.error;
     }
@@ -122,11 +122,11 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Supabase error:", JSON.stringify(error, null, 2));
       return NextResponse.json(
-        { 
+        {
           error: "Failed to save user to wishlist",
           details: error.message || error.code || "Unknown error",
           code: error.code,
-          hint: error.message?.includes("has_ticket") || error.message?.includes("column") 
+          hint: error.message?.includes("has_ticket") || error.message?.includes("column")
             ? "Please ensure you have run the database migration (supabase-migration.sql)"
             : "Check your Supabase configuration and table structure"
         },
