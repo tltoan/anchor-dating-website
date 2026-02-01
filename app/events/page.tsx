@@ -85,7 +85,8 @@ function EventsContent() {
   };
 
   const handlePurchaseTicket = () => {
-    if (websiteUserId && formData.email && formData.name) {
+    // Use logged-in user (websiteUserId from phone OTP or email) for purchase
+    if (websiteUserId) {
       setStep("payment");
     } else {
       setStep("email");
@@ -166,8 +167,6 @@ function EventsContent() {
             userId={websiteUserId}
             onProfileLoginSuccess={handleProfileLoginSuccess}
             onProfileLogout={handleProfileLogout}
-            profileModalOpen={profileModalOpen}
-            onCloseProfileModal={() => setProfileModalOpen(false)}
           />
         )}
         {step === "detail" && selectedEvent && (
@@ -177,13 +176,15 @@ function EventsContent() {
             onBuyTicket={() => {
               if (!websiteUserId) {
                 localStorage.setItem("anchor_events_pendingAction", "purchase");
+                setProfileModalOpen(true);
+              } else {
+                handlePurchaseTicket();
               }
-              handlePurchaseTicket();
             }}
             onSeeHistory={() => {
               if (!websiteUserId) {
                 localStorage.setItem("anchor_events_pendingAction", "history");
-                setStep("email");
+                setProfileModalOpen(true);
               } else {
                 setStep("history");
               }
@@ -257,6 +258,28 @@ function EventsContent() {
           />
         )}
       </AnimatePresence>
+
+      {profileModalOpen && (
+        <EventsProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          isLoggedIn={!!websiteUserId}
+          userName={userName || formData.name}
+          userId={websiteUserId}
+          onLoginSuccess={(identifier, id, name) => {
+            handleProfileLoginSuccess(identifier, id, name);
+            const pending = localStorage.getItem("anchor_events_pendingAction");
+            if (pending === "purchase") {
+              localStorage.removeItem("anchor_events_pendingAction");
+              handlePurchaseTicket();
+            } else if (pending === "history") {
+              localStorage.removeItem("anchor_events_pendingAction");
+              setStep("history");
+            }
+          }}
+          onLogout={handleProfileLogout}
+        />
+      )}
     </main>
   );
 }
@@ -271,8 +294,6 @@ interface EventsListPageProps {
   userId: string;
   onProfileLoginSuccess: (identifier: string, id: string, name?: string) => void;
   onProfileLogout: () => void;
-  profileModalOpen: boolean;
-  onCloseProfileModal: () => void;
 }
 
 function EventsListPage({
@@ -285,8 +306,6 @@ function EventsListPage({
   userId,
   onProfileLoginSuccess,
   onProfileLogout,
-  profileModalOpen,
-  onCloseProfileModal,
 }: EventsListPageProps) {
   return (
     <motion.div
@@ -329,18 +348,6 @@ function EventsListPage({
           <EventsList events={events} loading={loading} onEventClick={onEventClick} />
         </div>
       </div>
-
-      {profileModalOpen && (
-        <EventsProfileModal
-          isOpen={profileModalOpen}
-          onClose={onCloseProfileModal}
-          isLoggedIn={isLoggedIn}
-          userName={userName}
-          userId={userId}
-          onLoginSuccess={onProfileLoginSuccess}
-          onLogout={onProfileLogout}
-        />
-      )}
     </motion.div>
   );
 }

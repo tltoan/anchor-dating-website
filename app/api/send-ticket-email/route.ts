@@ -24,22 +24,39 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Get user email from waitlist by user_id
-    const { data: user, error: userError } = await supabase
+    // Get user email: try waitlist first, then users table (events flow)
+    let email: string | null = null
+    let name: string | null = null
+
+    const { data: waitlistUser } = await supabase
       .from("waitlist")
       .select("email, name")
       .eq("id", user_id)
-      .single()
+      .maybeSingle()
 
-    if (userError || !user) {
-      console.error("Failed to get user from waitlist:", userError)
+    if (waitlistUser) {
+      email = waitlistUser.email ?? null
+      name = waitlistUser.name ?? null
+    } else {
+      const { data: appUser } = await supabase
+        .from("users")
+        .select("email, first_name, last_name")
+        .eq("id", user_id)
+        .maybeSingle()
+      if (appUser) {
+        email = appUser.email ?? null
+        const first = appUser.first_name ?? ""
+        const last = appUser.last_name ?? ""
+        name = [first, last].filter(Boolean).join(" ").trim() || null
+      }
+    }
+
+    if (!email) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found or no email' },
         { status: 404 }
       )
     }
-
-    const { email, name } = user
 
     // For now, we'll use Supabase Edge Functions or a service like Resend
     // This is a placeholder - you'll need to set up email sending

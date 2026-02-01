@@ -15,9 +15,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    const { userId, paymentIntentId, email, name, phone } = await request.json()
-    console.log('userId=====', userId)
-    console.log('paymentIntentId', paymentIntentId)
+    const { userId, paymentIntentId } = await request.json()
     if (!paymentIntentId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -25,29 +23,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a NEW ticket entry in the tickets table
-    // This allows multiple tickets per user
-    // Tickets table has: id, user_id, email, name, phone, payment_intent_id, created_at
-    const ticketData: any = {
+    // Tickets table: id, user_id, payment_intent_id, created_at, status, updated_at (no email/name/phone)
+    const ticketData: Record<string, unknown> = {
       payment_intent_id: paymentIntentId,
-      ticket_purchased_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    };
-
-    // Add user_id if provided (for waitlist users)
+    }
     if (userId) {
-      ticketData.user_id = userId;
-    }
-
-    // Add email, name, phone if provided (for events website users)
-    if (email) {
-      ticketData.email = email.toLowerCase().trim();
-    }
-    if (name) {
-      ticketData.name = name;
-    }
-    if (phone) {
-      ticketData.phone = phone;
+      ticketData.user_id = userId
     }
 
     const { data, error } = await supabase
@@ -75,22 +56,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update has_ticket status in waitlist table
-    if (data && data[0]) {
+    // Update has_ticket in waitlist only when user is from waitlist (optional – don't fail for events/users table)
+    if (data && data[0] && userId) {
       const { error: updateError } = await supabase
         .from("waitlist")
         .update({ has_ticket: true })
         .eq("id", userId);
 
       if (updateError) {
-        // If has_ticket column doesn't exist, log warning but don't fail
         if (updateError.message?.includes("has_ticket") || updateError.message?.includes("column")) {
-          console.warn("has_ticket column not found in waitlist table. Please run migration.");
-        } else {
-          console.error("Failed to update has_ticket status:", updateError);
+          console.warn("has_ticket column not found in waitlist table.");
+        } else if (updateError.code !== "PGRST116") {
+          console.warn("Waitlist update skipped (user may be from users table):", updateError.message);
         }
-      } else {
-        console.log("Updated has_ticket to true for user:", userId);
       }
     }
 
