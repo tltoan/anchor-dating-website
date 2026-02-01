@@ -12,7 +12,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
   const router = useRouter();
 
   const handleEventsClick = () => {
-    router.push('/events');
+    router.push("/events");
   };
 
   return (

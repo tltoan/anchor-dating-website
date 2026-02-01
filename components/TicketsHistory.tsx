@@ -60,7 +60,7 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
       onClick={onClose}
     >
       <motion.div
-        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl my-8 mx-4 sm:mx-6"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl my-8 mx-4 sm:mx-6 overflow-hidden"
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
       >
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/5 via-transparent to-blue-500/5 pointer-events-none" />
 
-        <div className="relative z-10 p-8 sm:p-10">
+        <div className="relative z-10 box-border px-8 py-8 sm:px-12 sm:py-10 md:px-14 md:py-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-serif text-3xl text-white font-light">
               Your Tickets

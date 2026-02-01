@@ -37,8 +37,6 @@ export default function EventsProfileModal({
   onLoginSuccess,
   onLogout,
 }: EventsProfileModalProps) {
-  const [tickets, setTickets] = useState<EventsTicket[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<EventsTicket | null>(
     null,
@@ -56,29 +54,6 @@ export default function EventsProfileModal({
     },
     [userId],
   );
-
-  useEffect(() => {
-    if (!isOpen || !isLoggedIn || !userId) return;
-    setLoading(true);
-    const supabase = createClient();
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        const accessToken = session?.access_token;
-        return fetch("/api/get-events-tickets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId, access_token: accessToken }),
-        });
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) setTickets(data.tickets || []);
-        else toast.error(data.error || "Failed to load tickets");
-      })
-      .catch(() => toast.error("Failed to load tickets"))
-      .finally(() => setLoading(false));
-  }, [isOpen, isLoggedIn, userId]);
 
   const handleTicketClick = (ticket: EventsTicket) => {
     setQrData(generateQRData(ticket.payment_intent_id));
@@ -270,49 +245,6 @@ export default function EventsProfileModal({
                 >
                   Log out
                 </button>
-
-                <div>
-                  <h3 className="font-serif text-white/80 text-sm uppercase tracking-wider mb-3">
-                    Ticket history
-                  </h3>
-                  {loading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                    </div>
-                  ) : tickets.length === 0 ? (
-                    <p className="font-serif text-white/50 text-sm py-4">
-                      No tickets yet.
-                    </p>
-                  ) : (
-                    <ul className="space-y-2">
-                      {tickets.map((ticket) => (
-                        <li key={ticket.id}>
-                          <button
-                            type="button"
-                            onClick={() => handleTicketClick(ticket)}
-                            className="w-full text-left rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-                          >
-                            <p className="font-serif text-white font-medium">
-                              {ticket.name || "Ticket"}
-                            </p>
-                            <p className="font-serif text-white/60 text-xs mt-1">
-                              {ticket.ticket_purchased_at || ticket.created_at
-                                ? new Date(
-                                    ticket.ticket_purchased_at ||
-                                      ticket.created_at,
-                                  ).toLocaleDateString()
-                                : ""}{" "}
-                              · #{ticket.payment_intent_id?.slice(-8) || "—"}
-                            </p>
-                            <p className="font-serif text-emerald-400/80 text-xs mt-1">
-                              Confirmed
-                            </p>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
               </motion.div>
             )}
           </AnimatePresence>

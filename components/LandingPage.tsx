@@ -231,4 +231,3 @@ export default function LandingPage({ onJoinWaitlist }: LandingPageProps) {
     </div>
   );
 }
-
