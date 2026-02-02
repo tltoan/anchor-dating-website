@@ -29,13 +29,13 @@ interface Ticket {
 
 export default function AdminScanPage() {
   const params = useParams();
-  const router = useRouter();
   const ticketId = params.id as string; // This corresponds to payment_intent_id
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [justCheckedIn, setJustCheckedIn] = useState(false);
 
   const supabase = createClient();
 
@@ -121,8 +121,6 @@ export default function AdminScanPage() {
         .single();
       if (eventError) throw eventError;
 
-      console.log(userData.first_name, "ticketData");
-
       const ticket = {
         ...data,
         eventTitle: eventData.title,
@@ -135,9 +133,21 @@ export default function AdminScanPage() {
         userPhone: userData.phone_number,
       };
       setTicket(ticket);
+
+      if (data.status === "checked_in") {
+        toast.error("⚠️ WARNING: This ticket has ALREADY been used!", {
+          duration: 5000,
+          style: {
+            border: "1px solid #EF4444",
+            padding: "16px",
+            color: "#EF4444",
+            background: "#1F2937",
+          },
+        });
+      }
     } catch (err) {
       console.error("Fetch ticket failed:", err);
-      setError("Ticket not found or invalid QR code.");
+      setError("INVALID TICKET: Ticket not found or fake QR code.");
     } finally {
       setLoading(false);
     }
@@ -155,6 +165,11 @@ export default function AdminScanPage() {
       if (error) throw error;
 
       setTicket({ ...ticket, status: newStatus });
+      if (newStatus === "checked_in") {
+        setJustCheckedIn(true);
+      } else {
+        setJustCheckedIn(false);
+      }
       toast.success(`Ticket marked as ${newStatus}`);
     } catch (err) {
       console.error("Update status failed:", err);
@@ -233,11 +248,17 @@ export default function AdminScanPage() {
           >
             <div className="mb-6 text-center">
               <div
-                className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${ticket.status === "checked_in" ? "bg-green-500/20 text-green-400" : "bg-blue-500/20 text-blue-400"}`}
+                className={`mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border-4 ${
+                  justCheckedIn
+                    ? "border-green-500/30 bg-green-500/20 text-green-500"
+                    : ticket.status === "checked_in"
+                      ? "border-red-500/30 bg-red-500/20 text-red-500"
+                      : "border-blue-500/30 bg-blue-500/20 text-blue-400"
+                }`}
               >
-                {ticket.status === "checked_in" ? (
+                {justCheckedIn ? (
                   <svg
-                    className="h-8 w-8"
+                    className="h-10 w-10"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -249,9 +270,9 @@ export default function AdminScanPage() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                ) : (
+                ) : ticket.status === "checked_in" ? (
                   <svg
-                    className="h-8 w-8"
+                    className="h-10 w-10"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -260,17 +281,74 @@ export default function AdminScanPage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-10 w-10"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 )}
               </div>
-              <h2 className="font-serif text-2xl font-medium">
-                {ticket.userName}
+              <h2 className="font-serif text-3xl font-medium">
+                {justCheckedIn
+                  ? "CHECKED IN"
+                  : ticket.status === "checked_in"
+                    ? "ALREADY USED"
+                    : "VALID TICKET"}
               </h2>
+              <p className="mt-2 text-white/60">
+                {justCheckedIn
+                  ? "Ticket successfully checked in."
+                  : ticket.status === "checked_in"
+                    ? "This ticket has already been checked in."
+                    : "This ticket is valid and ready for check-in."}
+              </p>
+            </div>
+
+            {/* Event Details Section */}
+            <div className="mb-4 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+              <h3 className="font-serif text-lg text-white/90">
+                Event Details
+              </h3>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/60">Event</span>
+                <span className="font-medium text-right">
+                  {ticket.eventTitle}
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/60">Location</span>
+                <span className="text-right">{ticket.eventLocation}</span>
+              </div>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/60">Date</span>
+                <span className="text-right">
+                  {ticket.eventTicketPurchaseDate}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">Price</span>
+                <span>${ticket.eventPrice}</span>
+              </div>
             </div>
 
             <div className="space-y-4 rounded-xl bg-white/5 p-4">
+              <h3 className="font-serif text-lg text-white/90">User Details</h3>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-white/60">Name</span>
+                <span className="font-medium">{ticket.userName}</span>
+              </div>
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-white/60">
                   {ticket.userPhone !== null ? "Phone" : "Email"}
