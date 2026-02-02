@@ -31,12 +31,11 @@ export default function TicketSuccess({
 
   // Generate QR code data for a specific ticket
   const generateQRData = useCallback((ticketPaymentIntentId: string) => {
-    return JSON.stringify({
-      id: ticketPaymentIntentId,
-      email: userId,
-      timestamp: Date.now(),
-    });
-  }, [userId]);
+    // Return a URL that leads to the admin scan page
+    // Using window.location.origin to get the current domain
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/admin/scan/${ticketPaymentIntentId}`;
+  }, []);
 
   useEffect(() => {
     // Generate unique QR code data for the current payment (payment intent ID + email for verification)

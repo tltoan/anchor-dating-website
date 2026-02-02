@@ -207,13 +207,17 @@ export default function PhoneOTPForm({
       <div
         className="relative rounded-3xl border border-white/10 bg-white/5 backdrop-blur-3xl shadow-2xl p-8"
         style={{
-          boxShadow: "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          boxShadow:
+            "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+          background:
+            "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
         }}
       >
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/5 via-transparent to-blue-500/5 pointer-events-none" />
         <div className="relative z-10">
-          <h2 className="mb-2 font-serif text-2xl text-white font-light text-center">{title}</h2>
+          <h2 className="mb-2 font-serif text-2xl text-white font-light text-center">
+            {title}
+          </h2>
           <p className="mb-6 font-serif text-white/70 text-sm text-center">
             {step === "phone"
               ? "Enter your phone number to receive a one-time code"
@@ -225,7 +229,10 @@ export default function PhoneOTPForm({
           {step === "name" ? (
             <form onSubmit={handleSaveName} className="space-y-4">
               <div>
-                <label htmlFor="name-new" className="block mb-2 font-serif text-white/80 text-sm">
+                <label
+                  htmlFor="name-new"
+                  className="block mb-2 font-serif text-white/80 text-sm"
+                >
                   Your name
                 </label>
                 <input
@@ -262,7 +269,10 @@ export default function PhoneOTPForm({
           ) : step === "phone" ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div>
-                <label htmlFor="phone" className="block mb-2 font-serif text-white/80 text-sm">
+                <label
+                  htmlFor="phone"
+                  className="block mb-2 font-serif text-white/80 text-sm"
+                >
                   Phone number
                 </label>
                 <input
@@ -274,19 +284,7 @@ export default function PhoneOTPForm({
                   className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 font-serif text-white placeholder-white/50 backdrop-blur-xl focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
               </div>
-              <div>
-                <label htmlFor="name" className="block mb-2 font-serif text-white/80 text-sm">
-                  Name (optional)
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 font-serif text-white placeholder-white/50 backdrop-blur-xl focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-                />
-              </div>
+
               <div className="flex gap-3 pt-2">
                 <motion.button
                   type="button"
@@ -311,7 +309,10 @@ export default function PhoneOTPForm({
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div>
-                <label htmlFor="otp" className="block mb-2 font-serif text-white/80 text-sm">
+                <label
+                  htmlFor="otp"
+                  className="block mb-2 font-serif text-white/80 text-sm"
+                >
                   OTP code
                 </label>
                 <input
@@ -320,7 +321,9 @@ export default function PhoneOTPForm({
                   inputMode="numeric"
                   maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
                   placeholder="000000"
                   className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 font-serif text-white placeholder-white/50 backdrop-blur-xl focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 text-center text-lg tracking-widest"
                 />

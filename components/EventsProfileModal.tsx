@@ -46,13 +46,10 @@ export default function EventsProfileModal({
 
   const generateQRData = useCallback(
     (paymentIntentId: string) => {
-      return JSON.stringify({
-        id: paymentIntentId,
-        userId,
-        timestamp: Date.now(),
-      });
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      return `${origin}/admin/scan/${paymentIntentId}`;
     },
-    [userId],
+    [],
   );
 
   const handleTicketClick = (ticket: EventsTicket) => {

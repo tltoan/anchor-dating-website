@@ -1,54 +1,65 @@
 "use client";
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import toast from 'react-hot-toast'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 interface EmailEntryFormProps {
-  onSuccess: (email: string, userId: string, name?: string, phone?: string) => void
-  onCancel: () => void
-  title?: string
+  onSuccess: (
+    email: string,
+    userId: string,
+    name?: string,
+    phone?: string,
+  ) => void;
+  onCancel: () => void;
+  title?: string;
 }
 
-export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter Your Email" }: EmailEntryFormProps) {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [loading, setLoading] = useState(false)
+export default function EmailEntryForm({
+  onSuccess,
+  onCancel,
+  title = "Enter Your Email",
+}: EmailEntryFormProps) {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!email) {
-      toast.error('Please enter your email address')
-      return
+      toast.error("Please enter your email address");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch('/api/events-auth', {
-        method: 'POST',
+      const response = await fetch("/api/events-auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, name }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok || !data.success) {
-        toast.error(data.error || 'Failed to process email')
-        return
+        toast.error(data.error || "Failed to process email");
+        return;
       }
 
-      toast.success(data.isNewUser ? 'Welcome! Account created.' : 'Welcome back!')
+      toast.success(
+        data.isNewUser ? "Welcome! Account created." : "Welcome back!",
+      );
       // Pass user data including name and phone
-      onSuccess(data.user.email, data.user.id, data.user.name || name, phone)
+      onSuccess(data.user.email, data.user.id, data.user.name || name, phone);
     } catch (err: any) {
-      toast.error(err.message || 'An error occurred')
+      toast.error(err.message || "An error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <motion.div
@@ -65,13 +76,15 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         onClick={(e) => e.stopPropagation()}
         style={{
-          boxShadow: "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          boxShadow:
+            "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+          background:
+            "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
         }}
       >
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/5 via-transparent to-blue-500/5 pointer-events-none" />
 
-        <div className="relative z-10" style={{padding: "20px",}}>
+        <div className="relative z-10" style={{ padding: "20px" }}>
           <h2 className="mb-6 font-serif text-3xl text-white font-light text-center">
             {title}
           </h2>
@@ -80,8 +93,11 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-            <div style={{margin: "20px"}}>
-              <label htmlFor="email" className="block mb-3 md:mb-4 font-serif text-white/80 text-sm">
+            <div style={{ margin: "20px" }}>
+              <label
+                htmlFor="email"
+                className="block mb-3 md:mb-4 font-serif text-white/80 text-sm"
+              >
                 Email *
               </label>
               <input
@@ -95,8 +111,11 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
               />
             </div>
 
-            <div style={{margin: "20px"}}>
-              <label htmlFor="name" className="block mb-3 md:mb-4 font-serif text-white/80 text-sm">
+            <div style={{ margin: "20px" }}>
+              <label
+                htmlFor="name"
+                className="block mb-3 md:mb-4 font-serif text-white/80 text-sm"
+              >
                 Name (Optional)
               </label>
               <input
@@ -109,8 +128,11 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
               />
             </div>
 
-            <div style={{margin: "20px"}}>
-              <label htmlFor="phone" className="block mb-3 md:mb-4 font-serif text-white/80 text-sm">
+            <div style={{ margin: "20px" }}>
+              <label
+                htmlFor="phone"
+                className="block mb-3 md:mb-4 font-serif text-white/80 text-sm"
+              >
                 Phone Number (Optional)
               </label>
               <input
@@ -123,7 +145,7 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
               />
             </div>
 
-            <div className="flex gap-3 mt-6" style={{margin: "20px"}}>
+            <div className="flex gap-3 mt-6" style={{ margin: "20px" }}>
               <motion.button
                 type="button"
                 onClick={onCancel}
@@ -140,12 +162,12 @@ export default function EmailEntryForm({ onSuccess, onCancel, title = "Enter You
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
               >
-                {loading ? 'Processing...' : 'Continue'}
+                {loading ? "Processing..." : "Continue"}
               </motion.button>
             </div>
           </form>
         </div>
       </motion.div>
     </motion.div>
-  )
+  );
 }
