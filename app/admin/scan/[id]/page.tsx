@@ -17,6 +17,14 @@ interface Ticket {
   status?: string;
   created_at: string;
   ticket_purchased_at?: string;
+  eventTitle: string;
+  eventDescription: string;
+  eventLocation: string;
+  eventPrice: number;
+  eventTicketPurchaseDate: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
 }
 
 export default function AdminScanPage() {
@@ -98,13 +106,13 @@ export default function AdminScanPage() {
         .single();
 
       if (error) throw error;
-      const { data: ticketData, error: ticketError } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
         .eq("id", data.user_id)
         .single();
 
-      if (ticketError) throw ticketError;
+      if (userError) throw userError;
 
       const { data: eventData, error: eventError } = await supabase
         .from("events")
@@ -113,8 +121,20 @@ export default function AdminScanPage() {
         .single();
       if (eventError) throw eventError;
 
-      console.log(eventData, "ticketData");
-      setTicket(data);
+      console.log(userData.first_name, "ticketData");
+
+      const ticket = {
+        ...data,
+        eventTitle: eventData.title,
+        eventDescription: eventData.description,
+        eventLocation: eventData.location,
+        eventPrice: eventData.price,
+        eventTicketPurchaseDate: eventData.date,
+        userName: userData.first_name,
+        userEmail: userData.email,
+        userPhone: userData.phone_number,
+      };
+      setTicket(ticket);
     } catch (err) {
       console.error("Fetch ticket failed:", err);
       setError("Ticket not found or invalid QR code.");
@@ -245,14 +265,21 @@ export default function AdminScanPage() {
                   </svg>
                 )}
               </div>
-              <h2 className="font-serif text-2xl font-medium">{ticket.name}</h2>
-              <p className="text-white/60">{ticket.email}</p>
+              <h2 className="font-serif text-2xl font-medium">
+                {ticket.userName}
+              </h2>
             </div>
 
             <div className="space-y-4 rounded-xl bg-white/5 p-4">
               <div className="flex justify-between border-b border-white/10 pb-2">
-                <span className="text-white/60">Phone</span>
-                <span>{ticket.phone}</span>
+                <span className="text-white/60">
+                  {ticket.userPhone !== null ? "Phone" : "Email"}
+                </span>
+                <span>
+                  {ticket.userPhone !== null
+                    ? ticket.userPhone
+                    : ticket.userEmail}
+                </span>
               </div>
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-white/60">Status</span>
