@@ -1,62 +1,73 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
-import { createClient } from '@/lib/supabase/client'
-import { QRCodeSVG } from 'qrcode.react'
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import { createClient } from "@/lib/supabase/client";
+import { QRCodeSVG } from "qrcode.react";
 
 interface Ticket {
-  id: string
-  user_id?: string
-  payment_intent_id: string
-  created_at: string
-  status?: string | null
-  updated_at?: string | null
+  id: string;
+  user_id?: string;
+  payment_intent_id: string;
+  created_at: string;
+  status?: string | null;
+  updated_at?: string | null;
 }
 
 interface TicketsHistoryProps {
-  email: string
-  userId: string
-  eventId?: string
-  onBuyNew: () => void
-  onClose: () => void
+  email: string;
+  userId: string;
+  eventId?: string;
+  onBuyNew: () => void;
+  onClose: () => void;
 }
 
-export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClose }: TicketsHistoryProps) {
-  const [tickets, setTickets] = useState<Ticket[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+export default function TicketsHistory({
+  email,
+  userId,
+  eventId,
+  onBuyNew,
+  onClose,
+}: TicketsHistoryProps) {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
 
   const generateQRData = useCallback((paymentIntentId: string) => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : ''
-    return `${origin}/admin/scan/${paymentIntentId}`
-  }, [])
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/admin/scan/${paymentIntentId}`;
+  }, []);
 
   // Same auth flow as purchase: use session (access_token) so API can resolve user and fetch tickets
   useEffect(() => {
     if (!userId) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
-    const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const accessToken = session?.access_token
-      return fetch('/api/get-events-tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, access_token: accessToken, event_id: eventId }),
+    const supabase = createClient();
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        const accessToken = session?.access_token;
+        return fetch("/api/get-events-tickets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            access_token: accessToken,
+            event_id: eventId,
+          }),
+        });
       })
-    })
       .then((res) => res.json())
       .then((data) => {
-        if (data.success) setTickets(data.tickets || [])
-        else toast.error(data.error || 'Failed to load tickets')
+        if (data.success) setTickets(data.tickets || []);
+        else toast.error(data.error || "Failed to load tickets");
       })
-      .catch(() => toast.error('Failed to load tickets'))
-      .finally(() => setLoading(false))
-  }, [userId, eventId])
-
+      .catch(() => toast.error("Failed to load tickets"))
+      .finally(() => setLoading(false));
+  }, [userId, eventId]);
 
   return (
     <motion.div
@@ -73,8 +84,10 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         onClick={(e) => e.stopPropagation()}
         style={{
-          boxShadow: "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-          background: "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
+          boxShadow:
+            "0 25px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+          background:
+            "linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
         }}
       >
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/5 via-transparent to-blue-500/5 pointer-events-none" />
@@ -89,15 +102,29 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
               className="text-white/70 hover:text-white transition-colors p-1 -m-1"
               type="button"
             >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           {(email || userId) && (
             <p className="font-serif text-white/70 text-sm mb-8 mt-1">
-              {email ? <>Email: <span className="text-white">{email}</span></> : 'Logged in with your account'}
+              {email && (
+                <>
+                  Email: <span className="text-white">{email}</span>
+                </>
+              )}
             </p>
           )}
 
@@ -136,30 +163,49 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
                       onClick={() => setSelectedTicket(null)}
                       className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-serif"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
                       </svg>
                       Back to tickets
                     </button>
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
-                      <p className="font-serif text-white/80 text-sm mb-1">Status</p>
-                      <p className="font-serif text-emerald-400 font-medium mb-4">Confirmed</p>
+                      <p className="font-serif text-white/80 text-sm mb-1">
+                        Status
+                      </p>
+                      <p className="font-serif text-emerald-400 font-medium mb-4">
+                        Confirmed
+                      </p>
                       {selectedTicket.payment_intent_id && (
                         <div className="inline-flex p-4 bg-white rounded-xl">
                           <QRCodeSVG
-                            value={generateQRData(selectedTicket.payment_intent_id)}
+                            value={generateQRData(
+                              selectedTicket.payment_intent_id,
+                            )}
                             size={200}
                             level="M"
                           />
                         </div>
                       )}
                       <p className="font-serif text-white/60 text-xs mt-4">
-                        Ticket #{selectedTicket.payment_intent_id?.slice(-8) || '—'}
+                        Ticket #
+                        {selectedTicket.payment_intent_id?.slice(-8) || "—"}
                       </p>
                       <p className="font-serif text-white/50 text-xs mt-1">
                         {selectedTicket.created_at
-                          ? new Date(selectedTicket.created_at).toLocaleDateString()
-                          : '—'}
+                          ? new Date(
+                              selectedTicket.created_at,
+                            ).toLocaleDateString()
+                          : "—"}
                       </p>
                     </div>
                   </motion.div>
@@ -183,10 +229,18 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
                             <p className="font-serif text-white font-medium mb-2">
-                              Ticket #{ticket.payment_intent_id?.slice(-8) || ticket.id?.slice(0, 8) || '—'}
+                              Ticket #
+                              {ticket.payment_intent_id?.slice(-8) ||
+                                ticket.id?.slice(0, 8) ||
+                                "—"}
                             </p>
                             <p className="font-serif text-white/70 text-sm mb-2">
-                              Purchased: {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : '—'}
+                              Purchased:{" "}
+                              {ticket.created_at
+                                ? new Date(
+                                    ticket.created_at,
+                                  ).toLocaleDateString()
+                                : "—"}
                             </p>
                             <p className="font-serif text-emerald-400/80 text-xs mb-1">
                               Confirmed
@@ -195,8 +249,18 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
                               Tap to view QR code
                             </p>
                           </div>
-                          <svg className="w-5 h-5 text-white/50 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <svg
+                            className="w-5 h-5 text-white/50 flex-shrink-0 mt-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
                           </svg>
                         </div>
                       </motion.div>
@@ -220,5 +284,5 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
         </div>
       </motion.div>
     </motion.div>
-  )
+  );
 }
