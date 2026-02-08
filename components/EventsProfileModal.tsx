@@ -24,7 +24,7 @@ interface EventsProfileModalProps {
   isLoggedIn: boolean;
   userName: string;
   userId: string;
-  onLoginSuccess: (identifier: string, id: string, name?: string) => void;
+  onLoginSuccess: (identifier: string, id: string, name?: string, isAdmin?: boolean, authUserId?: string) => void;
   onLogout: () => void;
 }
 
@@ -75,8 +75,10 @@ export default function EventsProfileModal({
     identifier: string,
     id: string,
     name?: string,
+    isAdmin?: boolean,
+    authUserId?: string,
   ) => {
-    onLoginSuccess(identifier, id, name);
+    onLoginSuccess(identifier, id, name, isAdmin, authUserId);
     setShowLoginForm(false);
     onClose();
   };

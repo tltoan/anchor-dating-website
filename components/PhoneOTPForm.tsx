@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 
 interface PhoneOTPFormProps {
-  onSuccess: (identifier: string, userId: string, name?: string) => void;
+  onSuccess: (identifier: string, userId: string, name?: string, isAdmin?: boolean, authUserId?: string) => void;
   onCancel: () => void;
   title?: string;
 }
@@ -138,7 +138,7 @@ export default function PhoneOTPForm({
       const json = await res.json();
       if (res.ok && json.success) {
         toast.success("You're logged in!");
-        onSuccess(phoneE164, json.user.id, json.user.name || name || undefined);
+        onSuccess(phoneE164, json.user.id, json.user.name || name || undefined, json.user.is_admin, data.user?.id);
         return;
       }
       if (res.status === 400 && json.need_name) {
@@ -189,7 +189,7 @@ export default function PhoneOTPForm({
       }
       toast.success("You're all set!");
       setPendingAuth(null);
-      onSuccess(pendingAuth.phone, json.user.id, json.user.name || trimmedName);
+      onSuccess(pendingAuth.phone, json.user.id, json.user.name || trimmedName, json.user.is_admin, pendingAuth.auth_user_id || undefined);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to save");
     } finally {

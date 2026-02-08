@@ -10,6 +10,7 @@ interface EmailEntryFormProps {
     userId: string,
     name?: string,
     phone?: string,
+    isAdmin?: boolean,
   ) => void;
   onCancel: () => void;
   title?: string;
@@ -53,7 +54,7 @@ export default function EmailEntryForm({
         data.isNewUser ? "Welcome! Account created." : "Welcome back!",
       );
       // Pass user data including name and phone
-      onSuccess(data.user.email, data.user.id, data.user.name || name, phone);
+      onSuccess(data.user.email, data.user.id, data.user.name || name, phone, data.user.is_admin);
     } catch (err: any) {
       toast.error(err.message || "An error occurred");
     } finally {

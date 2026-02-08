@@ -12,6 +12,7 @@ export interface Event {
   image_url?: string;
   price: number;
   created_at?: string;
+  created_by?: string | null;
 }
 
 interface EventDetailProps {
@@ -19,6 +20,10 @@ interface EventDetailProps {
   onBuyTicket: () => void;
   onSeeHistory: () => void;
   onBack: () => void;
+  isAdmin?: boolean;
+  userId?: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export default function EventDetail({
@@ -26,7 +31,12 @@ export default function EventDetail({
   onBuyTicket,
   onSeeHistory,
   onBack,
+  isAdmin,
+  userId,
+  onEdit,
+  onDelete,
 }: EventDetailProps) {
+  const canManage = Boolean(isAdmin && userId && event.created_by === userId);
   let formattedDate = "";
   let formattedTime = "";
 
@@ -39,7 +49,7 @@ export default function EventDetail({
       formattedDate = new Date(event.date).toLocaleDateString();
       formattedTime = new Date(event.date).toLocaleTimeString();
     }
-  } catch (error) {
+  } catch {
     formattedDate = new Date(event.date).toLocaleDateString();
     formattedTime = new Date(event.date).toLocaleTimeString();
   }
@@ -212,6 +222,30 @@ export default function EventDetail({
                   </p>
                 </motion.div>
 
+                {/* Admin actions */}
+                {canManage && (onEdit || onDelete) && (
+                  <div className="flex gap-3 mb-6">
+                    {onEdit && (
+                      <motion.button
+                        type="button"
+                        onClick={onEdit}
+                        className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 font-serif text-white hover:bg-white/20"
+                      >
+                        Edit
+                      </motion.button>
+                    )}
+                    {onDelete && (
+                      <motion.button
+                        type="button"
+                        onClick={onDelete}
+                        className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 font-serif text-red-200 hover:bg-red-500/20"
+                      >
+                        Delete
+                      </motion.button>
+                    )}
+                  </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-5 md:gap-6">
                   <motion.button
@@ -264,7 +298,7 @@ export default function EventDetail({
                     whileTap={{ scale: 0.98 }}
                   >
                     <span className="relative z-10 flex items-center gap-3">
-                      See History
+                      Tickets
                       <motion.svg
                         className="h-5 w-5"
                         fill="none"

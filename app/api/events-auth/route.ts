@@ -17,13 +17,14 @@ function normalizePhoneForStorage(raw: string) {
   return `+${d}`
 }
 
-/** Map main app users row to events-auth user shape (id, name, email, phone) */
+/** Map main app users row to events-auth user shape (id, name, email, phone, is_admin) */
 function mapProfileToUser(profile: {
   id: string
   first_name?: string | null
   last_name?: string | null
   email?: string | null
   phone_number?: string | null
+  is_admin?: boolean | null
 }) {
   const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || null
   return {
@@ -31,6 +32,7 @@ function mapProfileToUser(profile: {
     name,
     email: profile.email ?? null,
     phone: profile.phone_number ?? null,
+    is_admin: Boolean(profile.is_admin),
   }
 }
 
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
         })
         const { data: profileByAuth, error: authErr } = await authClient
           .from('users')
-          .select('id, first_name, last_name, email, phone_number')
+          .select('id, first_name, last_name, email, phone_number, is_admin')
           .eq('auth_user_id', authUserId)
           .single()
 
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
         if (authUserId) {
           const { data: profileByAuth, error: authErr } = await supabaseAdmin
             .from('users')
-            .select('id, first_name, last_name, email, phone_number')
+            .select('id, first_name, last_name, email, phone_number, is_admin')
             .eq('auth_user_id', authUserId)
             .maybeSingle()
           if (!authErr && profileByAuth) {
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
           const phones = [phoneE164, phoneDigits].filter(Boolean) as string[]
           const { data: byPhone } = await supabaseAdmin
             .from('users')
-            .select('id, first_name, last_name, email, phone_number')
+            .select('id, first_name, last_name, email, phone_number, is_admin')
             .in('phone_number', phones)
             .limit(1)
             .maybeSingle()
@@ -151,7 +153,7 @@ export async function POST(request: NextRequest) {
             created_at: now,
             last_active_at: now,
           })
-          .select('id, first_name, last_name, email, phone_number')
+          .select('id, first_name, last_name, email, phone_number, is_admin')
           .single()
 
         if (!insertErr && newProfile) {
@@ -168,7 +170,7 @@ export async function POST(request: NextRequest) {
             const phones = [phoneE164, phoneDigits].filter(Boolean) as string[]
             const { data: existing } = await supabaseAdmin
               .from('users')
-              .select('id, first_name, last_name, email, phone_number')
+              .select('id, first_name, last_name, email, phone_number, is_admin')
               .in('phone_number', phones)
               .limit(1)
               .maybeSingle()
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
       : createClient(supabaseUrl, supabaseKey)
     const { data: profileByEmail, error: emailErr } = await supabaseEmail
       .from('users')
-      .select('id, first_name, last_name, email, phone_number')
+      .select('id, first_name, last_name, email, phone_number, is_admin')
       .eq('email', email.toLowerCase().trim())
       .maybeSingle()
 
