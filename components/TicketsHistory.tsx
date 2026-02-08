@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface Ticket {
   id: string
@@ -25,6 +26,12 @@ interface TicketsHistoryProps {
 export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClose }: TicketsHistoryProps) {
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+
+  const generateQRData = useCallback((paymentIntentId: string) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    return `${origin}/admin/scan/${paymentIntentId}`
+  }, [])
 
   // Same auth flow as purchase: use session (access_token) so API can resolve user and fetch tickets
   useEffect(() => {
@@ -114,40 +121,100 @@ export default function TicketsHistory({ email, userId, eventId, onBuyNew, onClo
             </div>
           ) : (
             <>
-              <div className="space-y-5 mb-8">
-                {tickets.map((ticket, index) => (
+              <AnimatePresence mode="wait">
+                {selectedTicket ? (
                   <motion.div
-                    key={ticket.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5"
+                    key="ticket-detail"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-6"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="font-serif text-white font-medium mb-2">
-                          Ticket #{ticket.payment_intent_id?.slice(-8) || ticket.id?.slice(0, 8) || '—'}
-                        </p>
-                        <p className="font-serif text-white/70 text-sm mb-2">
-                          Purchased: {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : '—'}
-                        </p>
-                        <p className="font-serif text-emerald-400/80 text-xs">
-                          Confirmed
-                        </p>
-                      </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTicket(null)}
+                      className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-serif"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Back to tickets
+                    </button>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+                      <p className="font-serif text-white/80 text-sm mb-1">Status</p>
+                      <p className="font-serif text-emerald-400 font-medium mb-4">Confirmed</p>
+                      {selectedTicket.payment_intent_id && (
+                        <div className="inline-flex p-4 bg-white rounded-xl">
+                          <QRCodeSVG
+                            value={generateQRData(selectedTicket.payment_intent_id)}
+                            size={200}
+                            level="M"
+                          />
+                        </div>
+                      )}
+                      <p className="font-serif text-white/60 text-xs mt-4">
+                        Ticket #{selectedTicket.payment_intent_id?.slice(-8) || '—'}
+                      </p>
+                      <p className="font-serif text-white/50 text-xs mt-1">
+                        {selectedTicket.created_at
+                          ? new Date(selectedTicket.created_at).toLocaleDateString()
+                          : '—'}
+                      </p>
                     </div>
                   </motion.div>
-                ))}
-              </div>
-              <motion.button
-                type="button"
-                onClick={onBuyNew}
-                className="w-full rounded-xl border border-white/20 bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 px-6 py-4 font-serif text-white backdrop-blur-xl transition-all hover:border-white/40 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 mt-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Buy New Ticket
-              </motion.button>
+                ) : (
+                  <motion.div
+                    key="ticket-list"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-5 mb-8"
+                  >
+                    {tickets.map((ticket, index) => (
+                      <motion.div
+                        key={ticket.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={() => setSelectedTicket(ticket)}
+                        className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 cursor-pointer transition-colors hover:bg-white/10 hover:border-white/20"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="font-serif text-white font-medium mb-2">
+                              Ticket #{ticket.payment_intent_id?.slice(-8) || ticket.id?.slice(0, 8) || '—'}
+                            </p>
+                            <p className="font-serif text-white/70 text-sm mb-2">
+                              Purchased: {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : '—'}
+                            </p>
+                            <p className="font-serif text-emerald-400/80 text-xs mb-1">
+                              Confirmed
+                            </p>
+                            <p className="font-serif text-white/50 text-xs">
+                              Tap to view QR code
+                            </p>
+                          </div>
+                          <svg className="w-5 h-5 text-white/50 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {!selectedTicket && (
+                <motion.button
+                  type="button"
+                  onClick={onBuyNew}
+                  className="w-full rounded-xl border border-white/20 bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 px-6 py-4 font-serif text-white backdrop-blur-xl transition-all hover:border-white/40 hover:from-pink-500/40 hover:via-purple-500/40 hover:to-blue-500/40 mt-2"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Buy New Ticket
+                </motion.button>
+              )}
             </>
           )}
         </div>
