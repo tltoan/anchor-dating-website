@@ -54,6 +54,18 @@ export async function POST(request: NextRequest) {
         const name = [p.first_name, p.last_name].filter(Boolean).join(' ').trim() || null
         user = { id: p.id, email: p.email ?? null, name }
       }
+      if (!user && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        const admin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY)
+        const { data: pAdmin } = await admin
+          .from('users')
+          .select('id, email, first_name, last_name')
+          .eq('id', userId)
+          .maybeSingle()
+        if (pAdmin) {
+          const name = [pAdmin.first_name, pAdmin.last_name].filter(Boolean).join(' ').trim() || null
+          user = { id: pAdmin.id, email: pAdmin.email ?? null, name }
+        }
+      }
     }
     if (!user && email) {
       const { data: p } = await supabase

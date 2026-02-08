@@ -462,6 +462,7 @@ function EventsContent() {
             key="ticket"
             userId={websiteUserId || userId}
             paymentIntentId={paymentIntentId}
+            eventId={selectedEvent?.id}
             onWalletAdded={handleWalletAdded}
             onBack={() => {
               if (selectedEvent) {

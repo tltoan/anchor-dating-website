@@ -3,12 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
+import { createClient } from "@/lib/supabase/client";
 
 interface TicketSuccessProps {
   userId: string;
   paymentIntentId: string;
   onWalletAdded: () => void;
   onBack?: () => void;
+  /** When set, only tickets for this event are shown (e.g. after buying for one event). */
+  eventId?: string;
 }
 
 interface Ticket {
@@ -23,6 +26,7 @@ export default function TicketSuccess({
   paymentIntentId,
   onWalletAdded,
   onBack,
+  eventId,
 }: TicketSuccessProps) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,24 +47,41 @@ export default function TicketSuccess({
     setQrData(qrString);
     setSelectedTicketId(paymentIntentId);
 
-    // Fetch user tickets
+    // Fetch tickets: for this event only when eventId is set, otherwise all user tickets
     const fetchTickets = async () => {
       try {
-        const response = await fetch("/api/get-user-tickets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setTickets(data.tickets || []);
+        if (eventId) {
+          const supabase = createClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          const response = await fetch("/api/get-events-tickets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: userId,
+              event_id: eventId,
+              access_token: session?.access_token ?? undefined,
+            }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setTickets(data.tickets || []);
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error("Failed to fetch tickets:", errorData.error || "Unknown error");
+          }
         } else {
-          const errorData = await response.json().catch(() => ({}));
-          console.error(
-            "Failed to fetch tickets:",
-            errorData.error || "Unknown error"
-          );
+          const response = await fetch("/api/get-user-tickets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userId }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setTickets(data.tickets || []);
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error("Failed to fetch tickets:", errorData.error || "Unknown error");
+          }
         }
       } catch (error) {
         console.error("Failed to fetch tickets:", error);
@@ -82,7 +103,7 @@ export default function TicketSuccess({
     }).catch((error) => {
       console.error("Failed to send email:", error);
     });
-  }, [paymentIntentId, userId, generateQRData]);
+  }, [paymentIntentId, userId, eventId, generateQRData]);
 
   const handleStoreClick = (store: "appstore" | "playstore") => {
     const appStoreUrl =
