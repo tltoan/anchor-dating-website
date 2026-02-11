@@ -31,7 +31,7 @@ export default function TicketsHistory({
   onClose,
 }: TicketsHistoryProps) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(userId));
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
 
   const generateQRData = useCallback((paymentIntentId: string) => {
@@ -41,10 +41,7 @@ export default function TicketsHistory({
 
   // Same auth flow as purchase: use session (access_token) so API can resolve user and fetch tickets
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
+    if (!userId) return;
     const supabase = createClient();
     supabase.auth
       .getSession()

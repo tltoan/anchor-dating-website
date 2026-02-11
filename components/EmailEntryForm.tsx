@@ -55,8 +55,9 @@ export default function EmailEntryForm({
       );
       // Pass user data including name and phone
       onSuccess(data.user.email, data.user.id, data.user.name || name, phone, data.user.is_admin);
-    } catch (err: any) {
-      toast.error(err.message || "An error occurred");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An error occurred";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -8,27 +8,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { LandingWaitlistInput } from "@/components/LandingFooter";
-import Link from "next/link";
-
-// move to env
-const appstoreLink =
-  "https://apps.apple.com/us/app/anchor-dating-first/id6757112248";
-
-// ─── Reusable components ────────────────────────────────────────
-
-function AppStoreBadge() {
-  return (
-    <Link href={appstoreLink} className="inline-block" target="_blank">
-      <Image
-        src="/Download_on_the_App_Store_Badge.png"
-        alt="App Store Badge"
-        width={200}
-        height={200}
-      />
-    </Link>
-  );
-}
+import AppStoreBadge from "@/components/landing/AppstoreBadge";
 
 function TextBubble({ children }: { children: string }) {
   return (
@@ -144,7 +124,7 @@ function PortraitImage({
 
 // ─── Main page component ────────────────────────────────────────
 
-export default function LandingPage() {
+export default function Page() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -157,10 +137,9 @@ export default function LandingPage() {
 
   // ===================== SCREEN 1 =====================
   const phoneOpacity = useTransform(s1, [0, 0.4], [1, 0]);
-  const badgeOpacity = useTransform(s1, [0.05, 0.3], [1, 0]);
-  const inputOpacity = useTransform(s1, [0.3, 0.55], [0, 1]);
-  const inputPointerEvents = useTransform(inputOpacity, (v) =>
-    v > 0.1 ? "auto" : "none",
+  const badgeOpacity = useTransform(scrollYProgress, [0.128, 0.144], [1, 0]);
+  const badgeVisibility = useTransform(badgeOpacity, (v) =>
+    v > 0.01 ? "visible" : "hidden",
   );
 
   const clubTop = useTransform(s1, [0, 0.7], ["17%", "-17%"]);
@@ -428,10 +407,10 @@ export default function LandingPage() {
 
   return (
     <div ref={containerRef} className="relative" style={{ height: "1620vh" }}>
-      <div className="sticky top-0 w-full h-screen pt-20 lg:pt-12 px-6 lg:px-14 flex items-center">
-        <div className="flex flex-col-reverse lg:flex-row w-full max-w-350 mx-auto gap-6 lg:gap-0 items-center">
+      <div className="sticky top-0 w-full h-screen pt-16 sm:pt-20 lg:pt-12 px-3 sm:px-6 lg:px-14 flex items-center">
+        <div className="flex flex-col-reverse lg:flex-row w-full max-w-350 mx-auto gap-16 lg:gap-0 items-center">
           {/* ===== LEFT SECTION ===== */}
-          <div className="w-full lg:w-1/2 flex flex-col justify-center lg:pr-16">
+          <div className="w-full lg:w-1/2 flex flex-col justify-center lg:pr-16 text-center md:text-left">
             <div className="relative">
               {/* Screen 1 text */}
               <motion.div style={{ opacity: text1Opacity }}>
@@ -442,26 +421,20 @@ export default function LandingPage() {
                 </h1>
                 <div className="mt-6 lg:mt-8 relative h-14">
                   <motion.div
-                    className="absolute top-0 left-0"
-                    style={{ opacity: badgeOpacity }}
-                  >
-                    <AppStoreBadge />
-                  </motion.div>
-                  <motion.div
-                    className="absolute top-0 left-0 w-full max-w-md"
+                    className="absolute top-0 left-1/2 -translate-x-1/2 md:left-0 md:translate-x-0"
                     style={{
-                      opacity: inputOpacity,
-                      pointerEvents: inputPointerEvents,
+                      opacity: badgeOpacity,
+                      visibility: badgeVisibility,
                     }}
                   >
-                    <LandingWaitlistInput />
+                    <AppStoreBadge />
                   </motion.div>
                 </div>
               </motion.div>
 
               {/* Screen 2-6 text — "Post" swaps to "Find" then "Match" */}
               <motion.div
-                className="absolute top-0 left-0"
+                className="absolute inset-0 w-full flex items-center justify-center md:items-start md:justify-start"
                 style={{ opacity: text2Opacity }}
               >
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.25rem] leading-[1.15] font-bold text-black">
@@ -493,8 +466,8 @@ export default function LandingPage() {
               </motion.div>
 
               {/* Screen 7-9 text — lines build up one by one */}
-              <div className="absolute top-0 left-0">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.25rem] leading-[1.15] font-bold text-black">
+              <div className="absolute top-0 left-0 w-full">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.25rem] leading-[1.15] font-bold text-black inline-block text-left">
                   <motion.span
                     className="block"
                     style={{ opacity: text7Opacity, x: text7TranslateX }}
@@ -520,7 +493,7 @@ export default function LandingPage() {
 
           {/* ===== RIGHT SECTION (Gradient box) ===== */}
           <div className="w-full lg:w-1/2 flex items-center justify-center lg:justify-end">
-            <div className="relative w-[75vw] max-w-70 sm:max-w-90 lg:w-full lg:max-w-140 aspect-square">
+            <div className="relative w-full sm:max-w-90 lg:w-full lg:max-w-140 aspect-square">
               {/* Outer gradient border */}
               <div
                 className="w-full h-full rounded-3xl p-1.5 overflow-hidden"
@@ -616,7 +589,7 @@ export default function LandingPage() {
                   <PlaceImage
                     src="/bar.png"
                     alt="Bar"
-                    className="top-[25%] left-[10%] w-[80%]"
+                    className="top-[25%] left-[3%] lg:left-[10%] w-[95%] lg:w-[80%]"
                     opacity={barOpacity}
                     translateX={barTranslateX}
                   />
@@ -632,7 +605,7 @@ export default function LandingPage() {
                   <PlaceImage
                     src="/places-pics/Theatre 940x555.png"
                     alt="Theatre"
-                    className="top-[5%] left-[8%] w-[85%]"
+                    className="top-[5%] left-[3%] lg:left-[8%] w-[95%] lg:w-[85%]"
                     opacity={theatreOpacity}
                     translateX={theatreTranslateX}
                   />
@@ -648,7 +621,7 @@ export default function LandingPage() {
                   <PlaceImage
                     src="/places-pics/Brunch Breakfast.png"
                     alt="Brunch"
-                    className="top-[45%] left-[10%] w-[80%]"
+                    className="top-[35%] lg:top-[45%] left-[3%] lg:left-[10%] w-[95%] lg:w-[80%]"
                     opacity={brunchOpacity}
                     translateX={brunchTranslateX}
                   />
@@ -665,14 +638,14 @@ export default function LandingPage() {
                   <PlaceImage
                     src="/places-pics/Cafe 940x555.png"
                     alt="Cafe"
-                    className="top-[25%] left-[10%] w-[80%]"
+                    className="top-[25%] left-[3%] lg:left-[10%] w-[95%] lg:w-[80%]"
                     opacity={cafeS5Opacity}
                     translateX={cafeS5TranslateX}
                   />
                   <AnimatedIcon
                     src="/anchor-icons/height_verification.png"
                     alt="Height verification"
-                    className="bottom-[8%] left-[1%] w-[30%]"
+                    className="bottom-[0%] lg:bottom-[8%] left-[1%] w-[30%]"
                     opacity={heightIcon5Opacity}
                     translateX={heightIcon5TranslateX}
                   />
@@ -681,7 +654,7 @@ export default function LandingPage() {
                   <PlaceImage
                     src="/places-pics/Jazz Music.png"
                     alt="Jazz"
-                    className="top-[40%] left-[8%] w-[85%]"
+                    className="top-[40%] left-[3%] lg:left-[8%] w-[95%] lg:w-[85%]"
                     opacity={jazzOpacity}
                     translateX={jazzTranslateX}
                   />
@@ -824,7 +797,7 @@ export default function LandingPage() {
 
               {/* S6 text box — left edge, below anchor, rotated 90deg CW */}
               <motion.div
-                className="absolute z-30 top-[20%] lg:top-[16%] left-[-20%] lg:left-[-16%]"
+                className="absolute z-30 top-[20%] lg:top-[16%] left-[-13%] lg:left-[-16%]"
                 style={{ opacity: s6AnchorOpacity, rotate: 90 }}
               >
                 <TextBubble>Jazz plans loading…</TextBubble>

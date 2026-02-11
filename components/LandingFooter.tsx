@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import AppStoreBadge from "./landing/AppstoreBadge";
 
 export interface LandingWaitlistInputProps {
   placeholder?: string;
@@ -10,44 +11,6 @@ export interface LandingWaitlistInputProps {
   onSubmit?: (value: string) => void;
   className?: string;
 }
-
-export const LandingWaitlistInput: React.FC<LandingWaitlistInputProps> = ({
-  placeholder = "name@gmail.com",
-  buttonLabel = "Join Waitlist",
-  onSubmit,
-  className,
-}) => {
-  const [value, setValue] = useState("");
-
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    if (onSubmit) {
-      onSubmit(value.trim());
-    }
-  };
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className={`flex w-full max-w-xl items-center rounded-full bg-[#7299ff] py-1 shadow-md shadow-slate-300/60 md:py-2 h-12 ${className || ""}`}
-    >
-      <input
-        type="email"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        placeholder={placeholder}
-        className="flex-1 border-none bg-transparent px-4 text-sm text-white placeholder:text-white/70 outline-none md:text-base"
-        style={{ paddingLeft: "1rem" }}
-      />
-      <button
-        type="submit"
-        className="inline-flex shrink-0 items-center justify-center rounded-full bg-black px-5 py-2 text-xs font-medium tracking-wide text-white transition hover:bg-neutral-900 md:px-2 md:py-2 md:text-sm w-28 h-12 cursor-pointer"
-      >
-        {buttonLabel}
-      </button>
-    </form>
-  );
-};
 
 const orbitIcons = [
   // Icons are placed evenly around a circle using polar coordinates
@@ -191,7 +154,7 @@ const LandingFooter: React.FC = () => {
             <span className="font-bold italic">date</span>
           </p>
 
-          <LandingWaitlistInput />
+          <AppStoreBadge />
         </div>
       </div>
     </footer>

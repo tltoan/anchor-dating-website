@@ -48,8 +48,9 @@ export default function EventsAuthForm({ onSuccess }: EventsAuthFormProps) {
 
       // Call success callback with email and user ID
       onSuccess(data.user.email, data.user.id)
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
