@@ -23,20 +23,11 @@ const supabase = createClient(supabaseUrl, serviceRoleKey)
 
 const events = [
   {
-    title: "Duke × UNC: The Day After Valentine's",
+    title: "Anchor's First Event @ one40.social",
     description:
-      "Valentine's Day is overrated. Celebrate the day after with us instead. Blue Devils and Tar Heels unite for one night. Bring your rivalry energy and your best self. Free drinks for the first 50.",
-    date: new Date('2025-02-15T21:00:00-05:00').toISOString(), // Sat Feb 15, 9PM EST
-    location: 'Lower East Side, NYC',
-    price: 0,
-    image_url: null,
-  },
-  {
-    title: 'Anchor Spring Mixer',
-    description:
-      "Winter's over. Come meet the people you'll be going on dates with all spring. Live DJ, good drinks, and zero swiping required. This is how you meet someone.",
-    date: new Date('2025-03-22T20:00:00-04:00').toISOString(), // Sat Mar 22, 8PM EDT
-    location: 'Williamsburg, Brooklyn',
+      "We hope you're as excited for our first event as we are with @one40.social!\n\nCome join us to celebrate Anchor's first event at @one40.social at 7PM this Thursday.\n\nMake sure to download Anchor before coming! P.S, come early... you might just get free drinks on us 👀",
+    date: new Date('2026-02-12T19:00:00-05:00').toISOString(), // Thu Feb 12, 7PM EST
+    location: 'one40.social, NYC',
     price: 0,
     image_url: null,
   },
@@ -50,7 +41,7 @@ async function seed() {
     // Continue anyway — table might be empty
   }
 
-  console.log('Inserting 2 events...')
+  console.log('Inserting 1 event...')
   const { data, error } = await supabase.from('events').insert(events).select()
 
   if (error) {

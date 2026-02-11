@@ -609,7 +609,7 @@ function EventsListPage({
             Come hang with us
           </h1>
           <p className="text-[17px] text-[#6B6560] leading-relaxed max-w-[480px] mx-auto">
-            Parties, meetups, and events thrown by the Anchor team. Show up, meet people, have fun.
+            Parties, meetups, and events thrown by the Anchor team. By attending, you'll get automatically matched with someone to chat with before the event — then meet up in person when you're there.
           </p>
         </motion.div>
       </section>
