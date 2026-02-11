@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Averia_Serif_Libre, Inter } from "next/font/google";
+import { Averia_Serif_Libre, Inter, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { Providers } from "@/components/Providers";
@@ -17,6 +17,12 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const dmSerifDisplay = DM_Serif_Display({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-dm-serif-display",
+});
+
 export const metadata: Metadata = {
   title: "Anchor - Where dating is guaranteed",
   description: "Anchor - dates, guaranteed",
@@ -28,9 +34,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${averiaSerif.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSerifDisplay.variable} ${averiaSerif.variable} ${inter.variable}`}
+    >
       <body
-        className={`${averiaSerif.variable} ${inter.variable} antialiased`}
+        className={`${dmSerifDisplay.variable} ${averiaSerif.variable} ${inter.variable} antialiased`}
         suppressHydrationWarning
       >
         <Providers>

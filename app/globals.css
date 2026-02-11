@@ -49,6 +49,11 @@ html {
   font-family: var(--font-averia-serif), "Averia Serif Libre", serif !important;
 }
 
+.font-dm-serif-display {
+  font-family:
+    var(--font-dm-serif-display), "DM Serif Display", serif !important;
+}
+
 /* Ensure font is applied to all serif elements */
 h1.font-serif,
 h2.font-serif,
