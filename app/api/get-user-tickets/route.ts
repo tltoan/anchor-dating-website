@@ -55,10 +55,12 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, tickets: tickets || [] });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Get user tickets error:", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch tickets";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch tickets" },
+      { error: message },
       { status: 500 }
     );
   }

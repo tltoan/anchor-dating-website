@@ -53,6 +53,7 @@ function HomeContent() {
 
   // Mark as client and restore state from localStorage/URL
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
 
     // Restore step from URL or localStorage

@@ -216,7 +216,7 @@ export default function WaitlistSignup({ onBack }: WaitlistSignupProps) {
                     transition={{ delay: 0.3 }}
                     className="mb-3 font-serif text-4xl md:text-5xl text-white font-light"
                   >
-                    You're on the list!
+                    You&apos;re on the list!
                   </motion.h2>
 
                   <motion.p
@@ -225,7 +225,7 @@ export default function WaitlistSignup({ onBack }: WaitlistSignupProps) {
                     transition={{ delay: 0.4 }}
                     className="text-white/70 font-serif text-base md:text-lg font-light mb-8"
                   >
-                    We'll notify you when Anchor launches. Get ready for guaranteed dates!
+                    We&apos;ll notify you when Anchor launches. Get ready for guaranteed dates!
                   </motion.p>
 
                   <motion.button

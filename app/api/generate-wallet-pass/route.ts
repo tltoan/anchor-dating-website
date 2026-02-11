@@ -77,10 +77,12 @@ export async function POST(request: NextRequest) {
     //     'Content-Disposition': `attachment; filename="anchor-ticket.pkpass"`,
     //   },
     // })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Wallet pass error:', error)
+    const message =
+      error instanceof Error ? error.message : 'Failed to generate wallet pass'
     return NextResponse.json(
-      { error: error.message || 'Failed to generate wallet pass' },
+      { error: message },
       { status: 500 }
     )
   }

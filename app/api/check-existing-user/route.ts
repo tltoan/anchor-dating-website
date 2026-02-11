@@ -140,10 +140,12 @@ export async function POST(request: NextRequest) {
       tickets: tickets,
       mismatch: false,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Check existing user error:", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to check user";
     return NextResponse.json(
-      { error: error.message || "Failed to check user" },
+      { error: message },
       { status: 500 }
     );
   }

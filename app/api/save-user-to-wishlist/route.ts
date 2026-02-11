@@ -28,7 +28,12 @@ export async function POST(request: NextRequest) {
     // Try with has_ticket first, fallback without it if column doesn't exist
     let data, error;
 
-    const insertData: any = {
+    const insertData: {
+      name: string;
+      email: string;
+      phone: string;
+      created_at: string;
+    } = {
       name,
       email,
       phone,
@@ -135,10 +140,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Save user to wishlist error:", error);
+    const message = error instanceof Error ? error.message : "Failed to save user";
     return NextResponse.json(
-      { error: error.message || "Failed to save user" },
+      { error: message },
       { status: 500 }
     );
   }

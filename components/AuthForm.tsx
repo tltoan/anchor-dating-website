@@ -36,8 +36,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           duration: 5000,
         })
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -60,8 +61,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         toast.success('Signed in successfully!')
         onSuccess?.()
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -83,8 +85,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         toast.success('New verification code sent! Please check your email.')
         setOtpCode('') // Clear the OTP input
       }
-    } catch (err: any) {
-      toast.error(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      toast.error(message)
     } finally {
       setResendingOTP(false)
     }
@@ -165,7 +168,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
                 <form onSubmit={handleVerifyOTP} className="space-y-4">
                   <div className="p-4 rounded-xl bg-blue-500/20 border border-blue-500/30 mb-4">
                     <p className="font-serif text-white/90 text-sm text-center">
-                      We've sent an 8-digit verification code to <strong>{email}</strong>
+                      We&apos;ve sent an 8-digit verification code to <strong>{email}</strong>
                     </p>
                   </div>
 
