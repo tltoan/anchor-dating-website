@@ -44,7 +44,29 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "Anchor - Where dating is guaranteed",
-  description: "Anchor - dates, guaranteed",
+  description: "On Anchor, every match is a date. Meet people the old-fashioned way.",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "Anchor - Where dating is guaranteed",
+    description: "On Anchor, every match is a date. Meet people the old-fashioned way.",
+    images: [{ url: "/anchor-header-logo.png", width: 1024, height: 1024 }],
+    siteName: "Anchor",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Anchor - Where dating is guaranteed",
+    description: "On Anchor, every match is a date.",
+    images: ["/anchor-header-logo.png"],
+  },
 };
 
 export default function RootLayout({

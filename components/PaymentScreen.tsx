@@ -252,7 +252,7 @@ export default function PaymentScreen({
     >
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-8 py-5 max-w-[1200px] mx-auto">
-        <a href="/landing" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <img
             src="/anchor-header-logo.png"
             alt="Anchor"
