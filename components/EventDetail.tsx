@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import Link from "next/link";
+import Image from "next/image";
 
 export interface Event {
   id: string;
@@ -64,8 +66,8 @@ export default function EventDetail({
     >
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-8 py-5 max-w-[1200px] mx-auto">
-        <a href="/" className="flex items-center gap-2">
-          <img
+        <Link href="/" className="flex items-center gap-2">
+          <Image
             src="/anchor-header-logo.png"
             alt="Anchor"
             width={64}
@@ -73,7 +75,7 @@ export default function EventDetail({
             className="rounded-2xl"
             style={{ boxShadow: "7px 10px 6.8px 0px #00000040" }}
           />
-        </a>
+        </Link>
         <motion.button
           onClick={onBack}
           className="flex items-center gap-2 text-sm font-medium text-[#6B6560] hover:text-[#1A1A1A] transition-colors"

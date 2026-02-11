@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormData } from "@/app/page";
+import { FormData } from "@/app/events/page";
 import toast from "react-hot-toast";
 import { QRCodeSVG } from "qrcode.react";
 

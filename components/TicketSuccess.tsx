@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -130,8 +132,8 @@ export default function TicketSuccess({
     >
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-8 py-5 max-w-[1200px] mx-auto">
-        <a href="/" className="flex items-center gap-2">
-          <img
+        <Link href="/" className="flex items-center gap-2">
+          <Image
             src="/anchor-header-logo.png"
             alt="Anchor"
             width={64}
@@ -139,7 +141,7 @@ export default function TicketSuccess({
             className="rounded-2xl"
             style={{ boxShadow: "7px 10px 6.8px 0px #00000040" }}
           />
-        </a>
+        </Link>
       </nav>
 
       <div className="flex min-h-[calc(100vh-80px)] items-start justify-center px-6 pt-8 pb-20">

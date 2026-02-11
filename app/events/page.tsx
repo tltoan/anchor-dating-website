@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import EventsList from "@/components/EventsList";
 import EventDetail, { Event } from "@/components/EventDetail";
@@ -555,8 +557,8 @@ function EventsListPage({
     >
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 sm:px-8 py-5 max-w-[1200px] mx-auto">
-        <a href="/" className="flex items-center gap-2">
-          <img
+        <Link href="/" className="flex items-center gap-2">
+          <Image
             src="/anchor-header-logo.png"
             alt="Anchor"
             width={64}
@@ -564,7 +566,7 @@ function EventsListPage({
             className="rounded-2xl"
             style={{ boxShadow: "7px 10px 6.8px 0px #00000040" }}
           />
-        </a>
+        </Link>
         <div className="flex items-center gap-4 sm:gap-8">
           {isAdmin && eventsView === "my" && (
             <motion.button
