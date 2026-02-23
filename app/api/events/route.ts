@@ -63,8 +63,13 @@ export async function GET(request: NextRequest) {
 
     // Default: return ALL events for everyone (simple users and admins). Anyone can browse and buy tickets.
     // Only when ?mine=1 and user is admin: return just that admin's own events (for "My events" screen).
+    // Exclude hidden events (synced from platform that left "live" status)
     const mine = request.nextUrl.searchParams.get('mine') === '1'
-    let query = supabase.from('events').select('*').order('date', { ascending: true })
+    let query = supabase
+      .from('events')
+      .select('*')
+      .or('is_hidden.is.null,is_hidden.eq.false')
+      .order('date', { ascending: true })
     if (mine && isAdmin && user) {
       query = query.eq('created_by', user.id)
     }
