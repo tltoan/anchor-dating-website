@@ -76,13 +76,13 @@ export default function CinematicFooter() {
       <div className="w-px h-32 bg-gradient-to-t from-[#ff96d1]/50 to-transparent absolute top-0" />
 
       <div className="flex flex-col items-center justify-center text-center z-10 w-full px-4 mb-24">
-        <div ref={textClipRef1} style={{ clipPath: "inset(0 100% 0 0)" }}>
-          <h2 className="font-dm-serif-display text-[clamp(4rem,14vw,200px)] leading-[0.85] text-white uppercase tracking-tighter">
+        <div ref={textClipRef1} className="py-3" style={{ clipPath: "inset(0 100% 0 0)" }}>
+          <h2 className="font-dm-serif-display text-[clamp(4rem,14vw,200px)] leading-[1] text-white uppercase tracking-tighter">
             Stop Swiping.
           </h2>
         </div>
-        <div ref={textClipRef2} style={{ clipPath: "inset(0 0 0 100%)" }}>
-          <h2 className="font-dm-serif-display text-[clamp(4rem,14vw,200px)] leading-[0.85] text-[#ff96d1] italic uppercase tracking-tighter">
+        <div ref={textClipRef2} className="py-3" style={{ clipPath: "inset(0 0 0 100%)" }}>
+          <h2 className="font-dm-serif-display text-[clamp(4rem,14vw,200px)] leading-[1] text-[#ff96d1] italic uppercase tracking-tighter">
             Start Living.
           </h2>
         </div>
