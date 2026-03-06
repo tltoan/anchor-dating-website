@@ -59,17 +59,19 @@ export default function CTAFooter() {
       <div className="max-w-[1280px] mx-auto flex flex-col items-center text-center">
         <div
           ref={line1Ref}
+          className="py-2"
           style={{ clipPath: "inset(0 100% 0 0)" }}
         >
-          <h2 className="font-dm-serif-display text-[clamp(3rem,7vw,100px)] text-white leading-[1.05]">
+          <h2 className="font-dm-serif-display text-[clamp(3rem,7vw,100px)] text-white leading-[1.1]">
             Stop Swiping.
           </h2>
         </div>
         <div
           ref={line2Ref}
+          className="py-2"
           style={{ clipPath: "inset(0 0 0 100%)" }}
         >
-          <h2 className="font-dm-serif-display text-[clamp(3rem,7vw,100px)] text-[#ff96d1] italic leading-[1.05]">
+          <h2 className="font-dm-serif-display text-[clamp(3rem,7vw,100px)] text-[#ff96d1] italic leading-[1.1]">
             Start Living.
           </h2>
         </div>
