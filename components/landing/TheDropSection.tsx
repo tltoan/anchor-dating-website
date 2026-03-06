@@ -199,14 +199,14 @@ export default function TheDropSection() {
 
   return (
     <section ref={sectionRef} className="relative py-24 lg:py-32 px-10 lg:px-20">
-      <div className="max-w-[1280px] mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-20">
+      <div className="max-w-[1280px] mx-auto flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-20">
         {/* Phone mockup */}
         <div ref={phoneRef} className="opacity-0 shrink-0 rotate-[4.06deg]">
           <PhoneMockup />
         </div>
 
         {/* Right content */}
-        <div ref={contentRef} className="flex-1">
+        <div ref={contentRef} className="max-w-[440px]">
           <p className="drop-item font-dm-sans font-medium text-[12px] text-white tracking-wide uppercase mb-3 opacity-0">
             WEEKLY FEATURE
           </p>

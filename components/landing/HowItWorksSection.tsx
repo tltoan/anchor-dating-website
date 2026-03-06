@@ -37,13 +37,12 @@ export default function HowItWorksSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLDivElement>(null);
-  const curveRef = useRef<SVGSVGElement>(null);
+  const curveWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Heading reveal
       gsap.fromTo(
         headingRef.current,
         { opacity: 0, y: 40 },
@@ -60,30 +59,26 @@ export default function HowItWorksSection() {
         }
       );
 
-      // Curvy path draw
-      if (curveRef.current) {
-        const path = curveRef.current.querySelector("path");
-        if (path) {
-          const len = path.getTotalLength();
-          gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
-          gsap.to(path, {
-            strokeDashoffset: 0,
-            duration: 1,
+      if (curveWrapperRef.current) {
+        gsap.fromTo(
+          curveWrapperRef.current,
+          { clipPath: "inset(0 0 100% 0)" },
+          {
+            clipPath: "inset(0 0 -5% 0)",
             ease: "none",
             scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 40%",
-              end: "bottom 60%",
-              scrub: 1,
+              trigger: stepsRef.current,
+              start: "top 70%",
+              end: "bottom 80%",
+              scrub: 0.8,
             },
-          });
-        }
+          }
+        );
       }
 
-      // Steps reveal with stagger
       const stepEls = stepsRef.current?.querySelectorAll(".step-item");
       if (stepEls) {
-        stepEls.forEach((step, i) => {
+        stepEls.forEach((step) => {
           const circle = step.querySelector(".step-circle");
           const content = step.querySelector(".step-content");
           const line = step.querySelector(".step-line");
@@ -168,7 +163,7 @@ export default function HowItWorksSection() {
           {/* Steps */}
           <div ref={stepsRef} className="flex flex-col gap-0 flex-1 max-w-[650px]">
             {steps.map((step, i) => (
-              <div key={step.num} className="step-item relative flex gap-6 pb-12">
+              <div key={step.num} className={`step-item relative flex gap-6 ${i < steps.length - 1 ? "pb-12" : "pb-0"}`}>
                 {/* Vertical connector */}
                 <div className="flex flex-col items-center shrink-0">
                   <div className="step-circle flex items-center justify-center w-[50px] h-[50px] bg-[#eaeaea] rounded-full shadow-[0_0_9.5px_0px_white]">
@@ -213,14 +208,16 @@ export default function HowItWorksSection() {
             ))}
           </div>
 
-          {/* Curvy decorative path */}
-          <div className="hidden lg:block w-[215px] shrink-0 relative">
+          {/* Curvy decorative path + chevron */}
+          <div
+            ref={curveWrapperRef}
+            className="hidden lg:block w-[215px] shrink-0 relative self-stretch"
+          >
             <svg
-              ref={curveRef}
               className="absolute top-0 left-0 w-full h-full"
-              preserveAspectRatio="none"
-              viewBox="0 0 216.5 691.5"
+              viewBox="0 0 216.5 780"
               fill="none"
+              preserveAspectRatio="none"
             >
               <path
                 d="M1.00015 1.00015C1.00015 1.00015 215.5 35.5001 215.5 149C215.5 262.5 34.5001 340 34.5001 374.5C34.5001 409 198.5 371.5 198.5 531C198.5 690.5 4.50015 690.5 4.50015 690.5"
@@ -228,7 +225,17 @@ export default function HowItWorksSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeDasharray="4 4"
+                vectorEffect="non-scaling-stroke"
               />
+              <g transform="translate(3.5, 675)">
+                <path
+                  d="M11.7491 1.00022C11.5428 1.41375 6.69093 8.00606 2.91407 12.3753C1.88144 13.5698 1.06325 14.4461 1.02188 15.1799C4.11528 18.6103 9.17359 23.6899 11.4256 26.5954C11.8841 27.1926 12.162 27.5434 12.4623 27.8409"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </g>
             </svg>
           </div>
         </div>
